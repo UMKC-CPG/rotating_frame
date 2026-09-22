@@ -42,6 +42,11 @@ design section it implements, status.
    and `tests/unit/test_frame.py`: the `Frame`, Rodrigues' rotation,
    the transforms, the launch conversion, the triads. Design 1.
    *draft*
+2. [`pseudocode/02-natural-units-and-presets.md`](
+   pseudocode/02-natural-units-and-presets.md) — governs
+   `core/natural_units.py`, `core/units.py`, `core/presets.py`, and
+   their tests: the scales, the pint boundary, the three presets,
+   the launch point and the local axes. Design 2. *draft*
 
 <!-- When a placeholder file is replaced, move its name from row 0
 to the row that now governs it, in the same edit. -->
