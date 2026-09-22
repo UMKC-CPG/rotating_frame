@@ -47,6 +47,10 @@ design section it implements, status.
    `core/natural_units.py`, `core/units.py`, `core/presets.py`, and
    their tests: the scales, the pint boundary, the three presets,
    the launch point and the local axes. Design 2. *draft*
+3. [`pseudocode/03-force-fields.md`](pseudocode/03-force-fields.md)
+   — governs `forces/force_interface.py`, `forces/fields.py`, and
+   `tests/unit/test_fields.py`: the contract, the three members,
+   `make_field`, the approximation note. Design 3. *draft*
 
 <!-- When a placeholder file is replaced, move its name from row 0
 to the row that now governs it, in the same edit. -->
