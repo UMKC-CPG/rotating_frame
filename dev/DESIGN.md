@@ -21,9 +21,10 @@ of Section 1.
 1. [`design/01-frame-and-transform.md`](design/01-frame-and-transform.md)
    — the `Frame` object, `R(t)`, the transforms of position and
    velocity, the sign conventions (A2.3, A6.6). *draft*
-2. `design/02-natural-units-and-presets.md` — the scaling by `Ω` and
-   `L`, the named presets (turntable, merry-go-round, Earth at a
-   latitude), the exaggeration factor (P11, P12). *planned*
+2. [`design/02-natural-units-and-presets.md`](
+   design/02-natural-units-and-presets.md) — the scaling by `Ω` and
+   `L`, mass per unit, the named presets (turntable, merry-go-round,
+   Earth at a latitude), the exaggeration factor (P11, P12). *draft*
 3. `design/03-force-fields.md` — the interface, no force, and the two
    kinds of uniform gravity; the bare attraction and the plumb line
    (A3.2, A4.2). *planned*
