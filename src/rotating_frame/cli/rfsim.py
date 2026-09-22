@@ -39,6 +39,13 @@ from rotating_frame.run import RunFileError, load_run_file
 COMMAND_NAME = 'rfsim'
 RC_FILENAME = 'rfsimrc.py'
 
+# The packages `--check` reports on: the ones this tool imports, by
+# the names `pip` knows them by. pyproject.toml declares the same set
+# (minus the Python 3.10 TOML backport), and a test keeps the two in
+# agreement. It lives here and not in support.py because it differs
+# per tool and the shared module must not.
+CHECKED_DISTRIBUTIONS = ('numpy', 'vedo', 'vtk')
+
 # The fallback of last resort, so that a damaged installation still
 # starts; the shipped defaults/rfsimrc.py is the documented source.
 BUILTIN_RC = {'window_size': [960, 720], 'default_palette': 'light',
@@ -120,7 +127,8 @@ def main(command_line_args=None):
     if args.write_rc:
         return copy_rc_file(RC_FILENAME, '.', COMMAND_NAME)
     if args.check:
-        return self_check(run_offscreen, COMMAND_NAME)
+        return self_check(run_offscreen, COMMAND_NAME,
+                          CHECKED_DISTRIBUTIONS)
 
     overrides = list(args.overrides)
     if args.palette:

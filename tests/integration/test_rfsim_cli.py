@@ -30,29 +30,30 @@ def test_packaged_examples_load_and_match_runs():
 
 def test_locate_run_file(run_directory, capsys):
     packaged = support.example_files()['circle']
-    assert support.locate_run_file(str(packaged)) == packaged
-    assert support.locate_run_file('circle') == packaged
-    assert support.locate_run_file('circle.toml') == packaged
+    assert support.locate_run_file(str(packaged), 'rfsim') == packaged
+    assert support.locate_run_file('circle', 'rfsim') == packaged
+    assert support.locate_run_file('circle.toml', 'rfsim') == packaged
     assert 'using the packaged example' in capsys.readouterr().err
     # A real file in the working directory always wins.
     (run_directory / 'circle.toml').write_text('schema = 1\n')
-    assert support.locate_run_file('circle.toml') == Path('circle.toml')
+    assert support.locate_run_file('circle.toml', 'rfsim') == \
+        Path('circle.toml')
     # A directory part, or an unknown name, is never rescued.
     for wrong in ('sub/circle', 'no_such_example'):
         with pytest.raises(FileNotFoundError, match='circle'):
-            support.locate_run_file(wrong)
+            support.locate_run_file(wrong, 'rfsim')
 
 
 def test_copy_examples_never_overwrites(tmp_path, capsys):
     target = tmp_path / 'my runs'
-    assert support.copy_examples(target) == 0
+    assert support.copy_examples(target, 'rfsim') == 0
     written = sorted(p.name for p in target.iterdir())
     assert written == sorted(p.name
                              for p in support.example_files().values())
     edited = target / 'circle.toml'
     edited.write_text('# my edit\n')
     capsys.readouterr()
-    assert support.copy_examples(target) == 0
+    assert support.copy_examples(target, 'rfsim') == 0
     assert edited.read_text() == '# my edit\n'
     assert capsys.readouterr().out.count('kept') == len(written)
 
@@ -64,14 +65,14 @@ def test_copy_into_a_read_only_directory_is_a_message(tmp_path, capsys):
     if os.access(locked, os.W_OK):
         pytest.skip('this user can write a read-only directory')
     try:
-        assert support.copy_examples(locked) == 1
+        assert support.copy_examples(locked, 'rfsim') == 1
     finally:
         locked.chmod(0o755)
     assert 'Choose a directory you can write' in capsys.readouterr().err
 
 
 def test_written_rc_file_loads_and_equals_the_defaults(tmp_path):
-    assert support.copy_rc_file(cli.RC_FILENAME, tmp_path) == 0
+    assert support.copy_rc_file(cli.RC_FILENAME, tmp_path, 'rfsim') == 0
     assert support.load_rc_defaults(cli.RC_FILENAME, {}, [tmp_path]) == \
         support.load_rc_defaults(cli.RC_FILENAME, {},
                                  [support.PACKAGE_DEFAULTS_DIR])

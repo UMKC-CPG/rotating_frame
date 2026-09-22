@@ -40,11 +40,9 @@ RC_ENVIRONMENT_VARIABLE = 'ROTATING_FRAME_RC'
 # asking for help, copying files, checking the machine.
 UTILITY_FLAGS = ('-h', '--help', '--examples', '--write-rc', '--check')
 
-# The packages `--check` reports on: the ones this tool imports, by
-# the names `pip` knows them by. pyproject.toml declares the same set
-# (minus the Python 3.10 TOML backport), and a test keeps the two in
-# agreement.
-CHECKED_DISTRIBUTIONS = ('numpy', 'vedo', 'vtk')
+# Nothing here names a command or the distributions a self-check
+# reports: those differ per tool and per command, and this file must
+# not, so the command module passes them in (physdemo PSEUDOCODE 4.7).
 
 
 def rc_search_path():
@@ -115,15 +113,17 @@ def example_files():
     return {path.stem: path for path in sorted(directory.glob('*.toml'))}
 
 
-def locate_run_file(argument, command_name='rfsim'):
-    """Turn the command line's run-file argument into a path.
+def locate_run_file(argument, command_name, noun='run file'):
+    """Turn the command line's run-file argument into a path. `noun`
+    is what the tool calls its input in messages ("scenario" in the
+    rigid-body tool).
 
     A file that exists is returned as it is; a real file always wins.
     Otherwise a BARE name (no directory part) that matches a packaged
     example, with or without `.toml`, selects that example, and one
     line on standard error says so. The rule is deliberately narrow:
-    `rfsim results/circle.toml` with a mistyped directory must fail
-    rather than quietly run something else.
+    `<command> results/circle.toml` with a mistyped directory must
+    fail rather than quietly run something else.
 
     Raises FileNotFoundError with a message a student can act on.
     """
@@ -139,12 +139,12 @@ def locate_run_file(argument, command_name='rfsim'):
             return examples[stem]
     names = ', '.join(examples) or '(none found)'
     raise FileNotFoundError(
-        f'{argument}: no such run file. Packaged examples: {names}. Run '
+        f'{argument}: no such {noun}. Packaged examples: {names}. Run '
         f'one by name ({command_name} {next(iter(examples), "NAME")}), '
         f'or copy them here to edit with: {command_name} --examples')
 
 
-def copy_without_overwriting(sources, directory, command_name='rfsim'):
+def copy_without_overwriting(sources, directory, command_name):
     """Copy each source file into `directory`, never replacing a file
     that is already there, and say what happened to each. Returns an
     exit status: 0, or 1 if the directory cannot be written.
@@ -171,13 +171,13 @@ def copy_without_overwriting(sources, directory, command_name='rfsim'):
     return 0
 
 
-def copy_examples(directory, command_name='rfsim'):
+def copy_examples(directory, command_name):
     """`--examples [DIR]`: the packaged run files, to edit."""
     return copy_without_overwriting(example_files().values(), directory,
                                     command_name)
 
 
-def copy_rc_file(rc_filename, directory='.', command_name='rfsim'):
+def copy_rc_file(rc_filename, directory, command_name):
     """`--write-rc`: a command's shipped rc defaults, to edit. The
     working directory is the first place the rc file is looked for,
     so the copy takes effect where it lands."""
@@ -185,10 +185,10 @@ def copy_rc_file(rc_filename, directory='.', command_name='rfsim'):
                                     directory, command_name)
 
 
-def installed_versions():
+def installed_versions(checked_distributions):
     """The version of each checked distribution, or None if missing."""
     versions = {}
-    for name in CHECKED_DISTRIBUTIONS:
+    for name in checked_distributions:
         try:
             versions[name] = metadata.version(name)
         except metadata.PackageNotFoundError:
@@ -196,11 +196,13 @@ def installed_versions():
     return versions
 
 
-def self_check(run_offscreen, command_name='rfsim'):
+def self_check(run_offscreen, command_name, checked_distributions):
     """`--check`: can this computer run the tool and draw it?
 
-    Reports the versions in use, runs the first packaged example for
-    two frames offscreen THROUGH THE ORDINARY CODE PATH
+    Reports the versions of `checked_distributions` (the command
+    module's list, which pyproject.toml declares and a test keeps in
+    agreement), runs the first packaged example for two frames
+    offscreen THROUGH THE ORDINARY CODE PATH
     (`run_offscreen(run_file_path, frames)`, passed in so that this
     module never imports the module that imports it), and reads the
     picture back. The read-back matters: a window without a working
@@ -215,7 +217,7 @@ def self_check(run_offscreen, command_name='rfsim'):
     print(f'python      {platform.python_version()}  ({sys.executable})')
     print(f'platform    {platform.system()} {platform.release()} '
           f'{platform.machine()}')
-    versions = installed_versions()
+    versions = installed_versions(checked_distributions)
     for name, version in versions.items():
         print(f'{name:<11} {version or "MISSING"}')
     missing = [name for name, version in versions.items() if not version]

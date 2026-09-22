@@ -18,8 +18,7 @@ except ModuleNotFoundError:                      # Python 3.10
     import tomli as tomllib
 
 import rotating_frame
-from rotating_frame.cli.support import (CHECKED_DISTRIBUTIONS,
-                                 PACKAGE_DEFAULTS_DIR, load_rc_defaults)
+from rotating_frame.cli.support import PACKAGE_DEFAULTS_DIR, load_rc_defaults
 
 PACKAGE_NAME = 'rotating_frame'
 REPO = Path(__file__).resolve().parents[2]
@@ -90,10 +89,20 @@ def test_every_imported_module_is_a_declared_dependency():
 
 
 def test_self_check_reports_on_the_declared_dependencies():
+    """Every command module that defines CHECKED_DISTRIBUTIONS (at
+    least one must) names exactly the declared dependencies, minus
+    the Python 3.10 TOML backport."""
     required = {line.split(';')[0].split('>')[0].strip().lower()
                 for line in PYPROJECT['project']['dependencies']}
     required.discard('tomli')                    # 3.10 backport only
-    assert {name.lower() for name in CHECKED_DISTRIBUTIONS} == required
+    checked = []
+    for target in PYPROJECT['project']['scripts'].values():
+        module = importlib.import_module(target.split(':')[0])
+        if hasattr(module, 'CHECKED_DISTRIBUTIONS'):
+            checked.append(module.CHECKED_DISTRIBUTIONS)
+    assert checked, 'no command module defines CHECKED_DISTRIBUTIONS'
+    for distributions in checked:
+        assert {name.lower() for name in distributions} == required
 
 
 def test_both_routes_create_the_same_command_names():
