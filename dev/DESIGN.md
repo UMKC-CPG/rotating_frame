@@ -35,8 +35,10 @@ of Section 1.
    check and for future fields, the stopping rules and the exact
    event, the drop oracle with its derived tolerance (A3.4, A6.2).
    *draft*
-5. `design/05-pseudo-forces.md` — the three terms from the
-   rotating-frame state; where each is evaluated (A3.5). *planned*
+5. [`design/05-pseudo-forces.md`](design/05-pseudo-forces.md) — the
+   three terms from the rotating-frame state, evaluated once for the
+   check and the store; what each view draws; the sign checks and
+   the closure test (A3.5). *draft*
 6. `design/06-check-and-error-budget.md` — the rotating-frame
    integration, the comparison against the transform, energy and the
    Jacobi integral, what is reported and never combined (P3, A3.6).
