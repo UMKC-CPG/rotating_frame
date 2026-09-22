@@ -4,7 +4,7 @@
 > PSEUDOCODE → Code. Implements ARCHITECTURE 3.5 (`pseudoforces/`);
 > serves G3 (draw every term), G2 (the check integrates the same
 > terms), P13 (one word), and P9. Uses Designs 1, 2, and 4.
-> *Status: draft.*
+> *Status: reviewed; ratified 2026-09-22.*
 
 One small module evaluates the three terms, once, for two consumers
 that must agree: the rotating-frame integration of Design 6 and the

@@ -107,6 +107,8 @@ is computed *before* anything is drawn, and stored as arrays:
   inertial[particle_index, sample_index, component]      position, velocity
   rotating[particle_index, sample_index, component]      position, velocity
   pseudo[particle_index, sample_index, term, component]  three vectors
+  ghost[particle_index, sample_index, component]         no pseudo-forces
+  check, comparison, overlay                             (DESIGN 6, 8)
 ```
 
 The interactive tier then never integrates during display. Play,
@@ -239,6 +241,8 @@ the same terms (P13, "one word": one code).
 | | Jacobi integral in the rotating one (P3) |
 | `comparison.py` | The rotating-frame integration against the |
 | | transform: the disclosed error, per sample (G2) |
+| `ghost_path.py` | The motion a rotating observer would predict |
+| | with no pseudo-forces, which scales the error and is drawn |
 | `closed_form_deflections.py` | The textbook deflections, to the |
 | | order they hold, for overlay and for the tests (G7) |
 
@@ -462,8 +466,9 @@ to grow, which is why it is a future direction and not a field.
 
 `results_store.py` hides how the precomputed run is held. It offers:
 the inertial and rotating state of a particle at a sample; the three
-pseudo-force vectors there; the comparison error there; the
-conservation readouts there; the sample times; and the store's size.
+pseudo-force vectors there; the ghost path and the first-order
+deflection there; the comparison error there; the conservation
+readouts there; the sample times; and the store's size.
 The scrubber and the panels speak only to this interface.
 
 ### 6.5 The renderer boundary (P9)

@@ -20,50 +20,53 @@ of Section 1.
 
 1. [`design/01-frame-and-transform.md`](design/01-frame-and-transform.md)
    — the `Frame` object, `R(t)`, the transforms of position and
-   velocity, the sign conventions (A2.3, A6.6). *draft*
+   velocity, the sign conventions (A2.3, A6.6). *reviewed*
 2. [`design/02-natural-units-and-presets.md`](
    design/02-natural-units-and-presets.md) — the scaling by `Ω` and
    `L`, mass per unit, the named presets (turntable, merry-go-round,
-   Earth at a latitude), the exaggeration factor (P11, P12). *draft*
+   Earth at a latitude), the exaggeration factor (P11, P12). *reviewed*
 3. [`design/03-force-fields.md`](design/03-force-fields.md) — the
    interface, no force, and the two kinds of uniform gravity; the
    bare attraction and the plumb line; where the uniform
-   approximation holds and its error (A3.2, A4.2). *draft*
+   approximation holds and its error (A3.2, A4.2). *reviewed*
 4. [`design/04-motion-and-stopping.md`](design/04-motion-and-stopping.md)
    — the closed forms (line, parabola, rotating parabola) and their
    small-angle evaluation, the sampling, the integrators for the
    check and for future fields, the stopping rules and the exact
    event, the drop oracle with its derived tolerance (A3.4, A6.2).
-   *draft*
+   *reviewed*
 5. [`design/05-pseudo-forces.md`](design/05-pseudo-forces.md) — the
    three terms from the rotating-frame state, evaluated once for the
    check and the store; what each view draws; the sign checks and
-   the closure test (A3.5). *draft*
+   the closure test (A3.5). *reviewed*
 6. [`design/06-check-and-error-budget.md`](
    design/06-check-and-error-budget.md) — the rotating-frame
    integration, the comparison against the transform and the ghost
    path that scales it, energy and the Jacobi integral, the three
    columns never combined, the first-order deflections (P3, A3.6).
-   *draft*
+   *reviewed*
 7. [`design/07-launches-and-the-ring.md`](
    design/07-launches-and-the-ring.md) — the launch point and local
    axes each preset supplies, a launch in either frame as offsets
-   and a velocity, the ring, what is refused (A3.3). *draft*
+   and a velocity, the ring, what is refused (A3.3). *reviewed*
 8. [`design/08-run-file.md`](design/08-run-file.md) — the TOML
    tables and keys, the schema and its refusals, precedence, the
    resolution to natural units and the write-back, the results store
-   and its interface, the driver (A3.7, A6.4, A7). *draft*
+   and its interface, the driver (A3.7, A6.4, A7). *reviewed*
 9. [`design/09-scene-and-geometry.md`](design/09-scene-and-geometry.md)
    — the two views and their cameras, the scene description, the
    triads, the stage, the trails, the arrows and their two stated
    scales, palettes and the redundancy rule, the panels, the
-   readouts (A3.8, A3.9). *draft*
+   readouts (A3.8, A3.9). *reviewed*
 10. [`design/10-scrubber-and-session.md`](
     design/10-scrubber-and-session.md) — viewing versus run controls
     and the one rule, the session state, the loop, the time slider,
-    every key chord, scripted controls, the invariants (A3.9). *draft*
+    every key chord, scripted controls, the invariants (A3.9). *reviewed*
 
 Status is one of: planned, draft, reviewed, implemented, superseded.
+All ten sections were reviewed together and ratified on 2026-09-22
+(`v0.3-design`); a section becomes *implemented* when its code and
+tests exist.
 A superseded section keeps its number and file; its header names the
 replacement. Numbers are never reused.
 
@@ -146,6 +149,14 @@ first version `θ = Ω t` (NG3).
 | | `½ m v_rot² + U − ½ m |Ω × r|²`, for a frame-fixed `U` |
 | `δ` | The comparison error, `|r_rot^check − r_rot|` at a |
 | | sample (Section 6) |
+| `Δ` | The pseudo-force effect, `ρ_rot − ρ_ghost` (Section 6); to |
+| | first order, `−Ω × (v₀ t² + g t³/3)` |
+| `η` | The comparison error as a fraction of the effect, `δ/|Δ|` |
+| `h` | Height above the ground, `ρ · ê_U` |
+| `ψ, χ` | A launch's azimuth (from north, clockwise seen from |
+| | above) and elevation (from the horizontal) |
+| `t_E` | `sqrt(R_E / g₀) ≈ 805 s`, the timescale of the uniform |
+| | approximation's error (Section 3) |
 
 **Signs and handedness.** `n̂` is the rotating frame's `ẑ` for the
 turntable and the merry-go-round, and the polar axis for the Earth,

@@ -3,7 +3,7 @@
 > **Document hierarchy:** VISION → ARCHITECTURE → **DESIGN** →
 > PSEUDOCODE → Code. Implements ARCHITECTURE 3.2 (`forces/`), 4.2
 > (where gravity lives), and 6.3 (the force boundary); serves G4,
-> NG5, and FD6. Uses Designs 1 and 2. *Status: draft.*
+> NG5, and FD6. Uses Designs 1 and 2. *Status: reviewed; ratified 2026-09-22.*
 
 The first version has two force fields, none and uniform gravity,
 and uniform gravity comes in two kinds. This section fixes the

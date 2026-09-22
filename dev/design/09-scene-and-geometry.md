@@ -5,7 +5,7 @@
 > 3.9 (`render/`), and the renderer boundary 6.5; serves G1 (two
 > frames at once), G3 (every term drawn), P5 (transparency), P6
 > (encodings), P9, and P12 (labeled distortions). Uses Designs 1, 2,
-> 5, 6, and 8. *Status: draft.*
+> 5, 6, and 8. *Status: reviewed; ratified 2026-09-22.*
 
 The display reads the results store and draws it twice: once as the
 room sees it and once as the rider sees it. This section fixes the
@@ -48,7 +48,7 @@ A following camera is a translating, non-rotating vantage, not a
 rotating one: the inertial triad stays put on screen while the
 rotating triad turns, and nothing is transformed but the camera's
 target. The mouse orbits, pans, and zooms each view independently,
-as vedo provides; `Ctrl+Home` in the session restores the run file's
+as vedo provides; `Ctrl+0` in the session restores the run file's
 cameras (Design 10).
 
 **Rejected: two windows.** Harder to keep in step, and the side-by-
@@ -109,10 +109,12 @@ so that its rotation can be seen:
   one. A puck that leaves it (Design 4.5) is not drawn falling: its
   trail ends at the rim, which is what the stopping event means.
 - *merry-go-round*: the platform disc at height `0` with spokes,
-  turning in the inertial view; and the floor, a grid at the
-  platform's height minus the launch height, fixed in the inertial
-  view and turning the other way in the rotating one, since the
-  floor belongs to the room.
+  turning in the inertial view; and the floor, a grid at the same
+  height beyond the platform's rim (the platform is flush with the
+  floor, Design 2.4), fixed in the inertial view and turning the
+  other way in the rotating one, since the floor belongs to the
+  room. A ball lands at height zero whether over the platform or
+  over the floor.
 - *Earth*: a square ground patch through `P` perpendicular to `ê_U`,
   of side four times the scene's extent, with a grid and a compass
   rose marking east and north; the local meridian is drawn as a
@@ -211,8 +213,11 @@ does, in a strip along the bottom, each with a key to hide it
    with the numbers at `t̃_k` and the run's maxima;
 3. **conservation**: the drift of `E` and of `J` along the exact
    path and the check, or the sentence saying why one is not
-   reported (Design 6.3);
-4. **the legend**: the key chords of Design 10.
+   reported (Design 6.3).
+
+The key legend is not a panel: it is a text block of its own
+(9.7), with its own switch, so that it can be shown while the panel
+strip is hidden.
 
 ## 9.7 The readouts
 
@@ -220,14 +225,18 @@ A text block in each view's corner, updated per sample:
 
 - the time, `t̃_k` and `t_k` in the preset's units, and the frame's
   angle `θ_k` in degrees;
-- for the tracked particle, in the rotating view: position as
+- for the tracked particle, in the rotating view: its launch as
+  given (speed, azimuth, elevation, or components, and the frame),
+  which the run controls of Design 10 change; its position as
   `(E, N, U)` from `P` and speed, in real units; the magnitude of
   each drawn arrow in `m/s²` (and in newtons when a mass is given);
 - the scale note: `1 unit = L`, `1 time unit = T`, the exaggeration
   `× α` when not one, the arrow-scale ratio when not one, and
   `camera follows P` when it does;
 - the approximation note of Design 3.4.2, with its number, on the
-  Earth.
+  Earth;
+- the legend of key chords (Design 10.5), in the lower left, with
+  its own switch.
 
 Every number is formatted back through the boundary (Design 2.5),
 so the screen never shows a natural-unit value without saying so.

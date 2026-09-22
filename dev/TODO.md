@@ -46,19 +46,7 @@ numbering so older cross-references still resolve.
 
 ## DESIGN
 
-- [ ] (D1–D10) The ten sections are drafted; a `/refine` pass over
-      the chain, then ratification and the `v0.3-design` tag.
-- [ ] (D10) The key bindings follow the scattering tool's scheme
-      (design 12.15 there): every key a Ctrl chord so that vedo's
-      own viewer keys are not shadowed, matched case-sensitively,
-      with a legend drawn in the window. Carry over the shared
-      vocabulary (Ctrl+space play/pause, Ctrl+s / Ctrl+S step,
-      Ctrl+plus / Ctrl+minus speed, Ctrl+r reverse, Ctrl+Home /
-      Ctrl+End, Ctrl+l loop, Ctrl+c palette, Ctrl+w save, Ctrl+h
-      legend, Ctrl+q quit) and the rigid-body tool's display toggles
-      for what is drawn (the vectors, the triads, the trails, the
-      stage), plus this tool's own: which view, which pseudo-force
-      terms, the check overlay.
+(none)
 
 ---
 
@@ -78,9 +66,20 @@ numbering so older cross-references still resolve.
 
 ## ARCHIVE
 
-- [x] (V1–V6) `dev/VISION.md` written and ratified 2026-09-22;
-      tagged `v0.1-vision`.
-- [x] (A2–A6) `dev/ARCHITECTURE.md` written and ratified 2026-09-22;
-      tagged `v0.2-architecture`.
-- [x] Generated from the physdemo member-tool skeleton; both routes,
-      the self-check, and the tests work on the placeholder.
+- [x] (D10) Done in design 10.5: the key bindings follow the scattering
+      tool's scheme (design 12.15 there): every key a Ctrl chord so that
+      vedo's own viewer keys are not shadowed, matched case-sensitively,
+      with a legend drawn in the window. Carry over the shared
+      vocabulary (Ctrl+space play/pause, Ctrl+s / Ctrl+S step, Ctrl+plus
+      / Ctrl+minus speed, Ctrl+r reverse, Ctrl+Home / Ctrl+End, Ctrl+l
+      loop, Ctrl+c palette, Ctrl+w save, Ctrl+h legend, Ctrl+q quit) and
+      the rigid-body tool's display toggles for what is drawn (the
+      vectors, the triads, the trails, the stage), plus this tool's own:
+      which view, which pseudo-force terms, the check overlay. - [x]
+      (V1–V6) `dev/VISION.md` written and ratified 2026-09-22; tagged
+      `v0.1-vision`. - [x] (A2–A6) `dev/ARCHITECTURE.md` written and
+      ratified 2026-09-22; tagged `v0.2-architecture`. - [x] (D1–D10)
+      The ten design sections written, refined (eleven findings, ten
+      applied), and ratified 2026-09-22; tagged `v0.3-design`. - [x]
+      Generated from the physdemo member-tool skeleton; both routes, the
+      self-check, and the tests work on the placeholder.

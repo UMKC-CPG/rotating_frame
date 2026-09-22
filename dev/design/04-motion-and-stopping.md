@@ -3,7 +3,7 @@
 > **Document hierarchy:** VISION → ARCHITECTURE → **DESIGN** →
 > PSEUDOCODE → Code. Implements ARCHITECTURE 3.4 (`motion/`) and 6.2
 > (the motion-provider boundary); serves P1, P2, P10, G2, G5, and G7.
-> Uses Designs 1 to 3. *Status: draft.*
+> Uses Designs 1 to 3. *Status: reviewed; ratified 2026-09-22.*
 
 The motion provider turns a launch, a force field, a frame, and a
 duration into inertial samples. This section fixes its contract, the

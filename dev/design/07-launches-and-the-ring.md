@@ -4,7 +4,7 @@
 > PSEUDOCODE → Code. Implements ARCHITECTURE 3.3 (`launch/`); serves
 > G4 (the demonstrations, including the ring), G6 (a run from a
 > file), and NG4 (independent particles). Uses Designs 1 to 4.
-> *Status: draft.*
+> *Status: reviewed; ratified 2026-09-22.*
 
 A launch is where a particle starts and how it is thrown, in the
 words a student would use: an offset from the launch point in local

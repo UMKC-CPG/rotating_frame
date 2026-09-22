@@ -4,7 +4,7 @@
 > PSEUDOCODE → Code. Implements ARCHITECTURE 3.7 (`run/`), 6.4 (the
 > results-store boundary), and 7 (configuration); serves G6 (any
 > run from a file), G5 (precompute, then view), and P11. Uses
-> Designs 1 to 7. *Status: draft.*
+> Designs 1 to 7. *Status: reviewed; ratified 2026-09-22.*
 
 A run file is the complete, self-contained description of one run,
 in the student's words and units. This section fixes its tables and
@@ -40,12 +40,13 @@ position      = ["0 m", "0 m", "100 m"]   # local E, N, U (Design 7.2)
 velocity      = ["0 m/s", "0 m/s", "0 m/s"]
 # or:  speed = "20 m/s", azimuth = "90 deg", elevation = "30 deg"
 frame         = "rotating"       # or "inertial"
+mass          = "0.2 kg"         # optional; readouts in newtons (2.2)
 label         = "stone"          # optional, for the readouts
 
-[ring]                           # optional; expands to launches (7.3)
-count = 12
-radius = "0.25 m"
-speed = "0.30 m/s"
+[ring]                           # optional; expands to launches (7.3);
+count = 12                       #   this example gives four of the
+radius = "0.25 m"                #   seven keys of Design 7.3, and the
+speed = "0.30 m/s"               #   schema holds all seven
 sense = "inward"
 
 [run]
@@ -67,19 +68,27 @@ views         = "both"           # "both" | "inertial" | "rotating"
 arrows        = ["true", "centrifugal", "coriolis", "euler", "sum",
                  "velocity"]
 ghost         = true             # the no-pseudo-force path (6.2)
+check_path    = false            # the check's own path (6.1)
 overlay       = "auto"           # first-order deflection: "auto" |
                                  #   "on" | "off" (6.5)
+triads        = true
+stage         = true
+panels        = true             # the panel strip (9.6)
+legend        = true             # the key legend (9.7)
+arrow_scale   = "auto"           # "auto" | "same" (9.4)
 tracked       = 0                # particle index for the readouts
-camera        = { azimuth_deg = 35, elevation_deg = 25, distance = 3 }
+camera        = { azimuth_deg = 35, elevation_deg = 25, distance = 3,
+                  follow = true }   # follow P, or fixed (9.1)
 ```
 
-**Which keys may be bare numbers.** `exaggeration`, `count`,
-`samples`, `substeps`, `rtol`, `atol`, `tracked`, and the `[view]`
-keys are dimensionless by nature. `rate`, `latitude`, `length_scale`,
-`magnitude`, `position`, `velocity`, `speed`, `azimuth`, `elevation`,
-`radius`, and `duration` are dimensioned; given bare, they are taken
-in natural units (`L`, `1/Ω`, `Ω L`, radians), and the write-back
-says so. A preset's own values are always in SI.
+**Which keys may be bare numbers.** `exaggeration`, `count`, `samples`,
+`substeps`, `rtol`, `atol`, `tracked`, and the `[view]` keys are
+dimensionless by nature; `mass` is dimensioned and, given bare, is in
+units of the unit mass, which changes no readout. `rate`, `latitude`,
+`length_scale`, `magnitude`, `position`, `velocity`, `speed`, `azimuth`,
+`elevation`, `radius`, and `duration` are dimensioned; given bare, they
+are taken in natural units (`L`, `1/Ω`, `Ω L`, radians), and the
+write-back says so. A preset's own values are always in SI.
 
 **Two shipped examples**, both complete after the preset fills
 in: `turntable.toml`, a puck pushed from the rim toward the center
@@ -153,10 +162,11 @@ original launch words for the write-back.
 
 `Ctrl+w` in the session (Design 10) and `--write-resolved` on the
 command line write the resolved run file: the same TOML with every
-default filled in, the preset's values written out in SI, and a
-comment block naming the scale factors, the exaggeration, and the
-tool's version. Loading it again resolves to an identical `RunSpec`
-(8.7), which is what "self-contained" means.
+default filled in, the preset's values written out in SI, the current
+viewing state in `[view]`, any launch or exaggeration or substeps
+changed by a run control, and a comment block naming the scale factors,
+the exaggeration, and the tool's version. Loading it again resolves to
+an identical `RunSpec` (8.7), which is what "self-contained" means.
 
 ## 8.5 The results store
 

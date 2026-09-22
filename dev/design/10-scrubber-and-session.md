@@ -4,7 +4,7 @@
 > PSEUDOCODE → Code. Implements ARCHITECTURE 3.9 (`ui/`) and the
 > session half of 3.10; serves G5 (scrub time both ways), G3 and G1
 > (what is shown), P4 (real-time manipulation), P12, and P5. Uses
-> Designs 6, 8, and 9. *Status: draft.*
+> Designs 6, 8, and 9. *Status: reviewed; ratified 2026-09-22.*
 
 The session owns one number, the sample index, and a handful of
 switches, and it turns keystrokes and a slider into changes of them.
@@ -20,8 +20,9 @@ the scripted controls the tests drive, and the invariants.
 A **viewing control** changes what is shown: the sample, the play
 state, the speed, the view, which arrows and paths and panels are
 drawn, the palette, the tracked particle, the camera. A **run
-control** changes the run: the exaggeration factor, or the check's
-substeps. The rule, taken from the scattering tool's design 12.2:
+control** changes the run: the exaggeration factor, the check's
+substeps, or the tracked particle's launch (its speed, azimuth, or
+elevation). The rule, taken from the scattering tool's design 12.2:
 
 > A run control makes a new store. A viewing control never touches
 > the store.
@@ -32,11 +33,16 @@ changed key, rebuilds the store through the driver (Design 8.6),
 which for the first version's closed forms takes well under a
 second (P4), and keeps every piece of viewing state, clamping the
 sample index to the new length. The screen's distortion column shows
-the new factor (Design 6.4). There are two run controls and no more:
-anything else about a run is edited in the run file, because the run
-file is the record (G6), and a control that could change the launch
-from the keyboard would leave a student with a picture no file
-describes.
+the new factor (Design 6.4), and the readouts show the current launch
+(Design 9.7), so that what is on screen is always described by
+numbers the student can see; `Ctrl+w` writes them into the resolved
+run file, so no picture is left that no file describes (G6). The
+launch controls are what P4 means by manipulation: a student turns
+the throw a little east and watches the deflection change. The run
+controls are these and no more: the frame, the field, the stopping
+rule, the duration, and a launch other than the tracked one are
+edited in the run file, because they change what the run *is* rather
+than how hard or which way something was thrown.
 
 ## 10.2 The session state
 
@@ -145,6 +151,13 @@ needs memorizing (P5).
 | | (a run control) |
 | `Ctrl+period`, `Ctrl+comma` | check substeps × 2 / ÷ 2 (a run |
 | | control) |
+| `Ctrl+Up`, `Ctrl+Down` | tracked launch's speed × 2 / ÷ 2 (a run |
+| | control) |
+| `Ctrl+Right`, `Ctrl+Left` | tracked launch's azimuth + 15° / − 15° |
+| | (a run control) |
+| `Ctrl+Prior`, `Ctrl+Next` | tracked launch's elevation + 15° / |
+| | − 15°, within ±90° (a run control; Page Up and Page Down, |
+| | under the names VTK gives them) |
 
 The rigid-body tool's display toggles (its body, ellipsoid, vectors,
 and triads) are the model for `Ctrl+1` … `Ctrl+6`, `Ctrl+t`, and
@@ -175,7 +188,12 @@ does. `--frames N` alone plays `N` ticks from the initial state.
   `Ω` is doubled, `k` and every switch survive, and the distortion
   column reads the new factor; `Ctrl+period` doubles the check's
   substeps and reduces `δ̃` by about sixteen (Design 6.6) while
-  leaving the exact arrays identical to the old store's.
+  leaving the exact arrays identical to the old store's; `Ctrl+Up`
+  doubles the tracked launch's speed in the new spec and no other
+  particle's samples change; `Ctrl+Right` on a ring member turns
+  that member's launch alone; elevation saturates at `±90°`; and
+  after any of them `Ctrl+w` writes a file whose launch table holds
+  the new values in the student's units.
 - The state machine, without a window: play then pause leaves `k`;
   step forward then back returns `k`; reverse then step moves the
   other way; at the last sample with `loop` off, a tick stops
@@ -200,9 +218,10 @@ does. `--frames N` alone plays `N` ticks from the initial state.
 
 - **Plain keys.** Shadowed by vedo's own bindings; both older tools
   moved to chords for this reason.
-- **Live editing of the launch or the rate from the keyboard.** A
-  picture no run file describes cannot be reproduced (G6). The two
-  run controls are the ones whose result the screen labels.
+- **Editing the frame, the field, the stopping rule, or the duration
+  from the keyboard.** They change what the run is, and a run file
+  is the record (G6). The launch controls are allowed because their
+  result is on screen in the readouts and `Ctrl+w` records it.
 - **An "exaggerate the deflection" control.** The deflection is not
   a thing apart from the physics (Design 2.6); exaggerating `Ω` is,
   and it is labeled.

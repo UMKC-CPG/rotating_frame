@@ -5,7 +5,7 @@
 > object) and 6.6 in part; serves P2 and G2 (the inertial frame
 > drives, the rotating frame is a transform), NG3 (a fixed axis
 > through a fixed origin), and leaves FD1 and FD2 open. Notation is
-> the index's. *Status: draft.*
+> the index's. *Status: reviewed; ratified 2026-09-22.*
 
 Every other section uses this one. It fixes what the `Frame` object
 holds, how the rotation `R(t)` is built, how a position and a

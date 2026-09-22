@@ -5,7 +5,7 @@
 > the comparison half of 6.1; serves G2 (integrate in the rotating
 > frame and show the difference), G7 (closed forms as oracles), P2,
 > and P3 (numerical error disclosed and kept apart). Uses Designs 1
-> to 5. *Status: draft.*
+> to 5. *Status: reviewed; ratified 2026-09-22.*
 
 The rotating-frame integration exists to be compared with the
 transform. This section fixes how it is run, what is compared and
@@ -62,7 +62,7 @@ the effect:
 
 ```
   Δ̃_k  = ρ̃_rot,k − ρ̃_ghost,k        the pseudo-force effect at k
-  ε_k   = δ̃_k / max(|Δ̃_k|, δ̃_floor)   error as a fraction of the effect
+  η_k   = δ̃_k / max(|Δ̃_k|, δ̃_floor)   error as a fraction of the effect
 ```
 
 where the **ghost path** `ρ̃_ghost` is what the rotating observer
@@ -127,7 +127,7 @@ nothing is ever added across them (P3):
 
 | Column | What it holds | Where it comes from |
 | --- | --- | --- |
-| **numerical** | `δ̃_k`, `ε_k`, and the drift of `E` or `J` | 6.2, 6.3 |
+| **numerical** | `δ̃_k`, `η_k`, and the drift of `E` or `J` | 6.2, 6.3 |
 | | along the check | |
 | **approximation** | the field's declared estimate, for the | Design 3.4.2 |
 | | Earth `½ (t̃_end / (Ω t_E))²`, and its words | |

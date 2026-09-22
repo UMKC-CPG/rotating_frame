@@ -4,7 +4,7 @@
 > PSEUDOCODE → Code. Implements ARCHITECTURE 3.1 (`natural_units.py`,
 > `units.py`, `presets.py`) and 6.6 (the units boundary); serves P11
 > (a dimensionless core, real units at the boundary) and P12 (labeled
-> distortions). Uses Design 1. *Status: draft.*
+> distortions). Uses Design 1. *Status: reviewed; ratified 2026-09-22.*
 
 The core works in units of the frame's rotation. This section fixes
 the scaling, says what a run is characterized by, states where real
@@ -99,17 +99,21 @@ the dimensionless numbers of 2.3. The three first-version presets:
 **`turntable`.** A frictionless puck on a spinning disc: `n̂ = ẑ`;
 `Ω = 33⅓ rpm = 3.4907 rad/s`; `L = 0.30 m`, the disc's radius; no
 force (the disc's normal force cancels gravity and the puck stays in
-the plane `z = 0`); the launch point anywhere on the disc, default
-the center; the stopping rule "leaves the disc" at `|ρ| > L`, or the
-duration. The stage is the disc.
+the plane `z = 0`); the launch point `P` at the disc's center, a
+launch's position being an offset from it (Design 7.1), the shipped
+example starting at the rim; the stopping rule "leaves the disc" at
+`|ρ| > L`, or the duration. The stage is the disc.
 
 **`merry_go_round`.** A ball thrown across a playground roundabout:
 `n̂ = ẑ`; `Ω = 0.50 rad/s` (about `4.8 rpm`); `L = 2.0 m`, the
 platform's radius; space-fixed gravity `g = 9.81 m/s²` along `−ẑ`;
-the launch point on the platform at a height of `1.0 m` above it,
-default at the rim; the stopping rule "lands" when the height above
-the platform reaches zero, or the duration. The stage is the
-platform and the floor.
+the launch point `P` on the axis at the platform's height, the
+shipped example launching from the rim at `1.0 m` above it (an offset,
+Design 7.1); the stopping rule "lands" when the height above the
+platform reaches zero, or the duration. The platform is flush with
+the floor, as a playground roundabout is, so landing is height zero
+everywhere, on the platform or off it. The stage is the platform and
+the floor.
 
 **`earth`.** A projectile at a latitude: `n̂ = ẑ`, the polar axis
 pointing north; `Ω = 7.2921150 × 10⁻⁵ rad/s`, the sidereal rate;
