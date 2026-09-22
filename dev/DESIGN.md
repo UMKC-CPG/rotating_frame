@@ -18,9 +18,9 @@ Each entry: number, file, topic, status. The order is the order the
 sections cite one another: every later section uses the conventions
 of Section 1.
 
-1. `design/01-frame-and-transform.md` — the `Frame` object, `R(t)`,
-   the transforms of position and velocity, the sign conventions
-   (A2.3, A6.6). *planned*
+1. [`design/01-frame-and-transform.md`](design/01-frame-and-transform.md)
+   — the `Frame` object, `R(t)`, the transforms of position and
+   velocity, the sign conventions (A2.3, A6.6). *draft*
 2. `design/02-natural-units-and-presets.md` — the scaling by `Ω` and
    `L`, the named presets (turntable, merry-go-round, Earth at a
    latitude), the exaggeration factor (P11, P12). *planned*
