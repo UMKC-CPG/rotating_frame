@@ -49,9 +49,10 @@ of Section 1.
    design/07-launches-and-the-ring.md) — the launch point and local
    axes each preset supplies, a launch in either frame as offsets
    and a velocity, the ring, what is refused (A3.3). *draft*
-8. `design/08-run-file.md` — the TOML schema, units, validation,
-   precedence, write-back, the results store (A3.7, A6.4, A7).
-   *planned*
+8. [`design/08-run-file.md`](design/08-run-file.md) — the TOML
+   tables and keys, the schema and its refusals, precedence, the
+   resolution to natural units and the write-back, the results store
+   and its interface, the driver (A3.7, A6.4, A7). *draft*
 9. `design/09-scene-and-geometry.md` — the two views, the triads,
    the stage, the trails, the vectors, palettes and the redundancy
    rule (A3.8, A3.9). *planned*
