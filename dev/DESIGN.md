@@ -29,10 +29,12 @@ of Section 1.
    interface, no force, and the two kinds of uniform gravity; the
    bare attraction and the plumb line; where the uniform
    approximation holds and its error (A3.2, A4.2). *draft*
-4. `design/04-motion-and-stopping.md` — the closed forms (line,
-   parabola, rotating-vector parabola), the integrators for the
-   check and for future fields, the stopping rules (A3.4, A6.2).
-   *planned*
+4. [`design/04-motion-and-stopping.md`](design/04-motion-and-stopping.md)
+   — the closed forms (line, parabola, rotating parabola) and their
+   small-angle evaluation, the sampling, the integrators for the
+   check and for future fields, the stopping rules and the exact
+   event, the drop oracle with its derived tolerance (A3.4, A6.2).
+   *draft*
 5. `design/05-pseudo-forces.md` — the three terms from the
    rotating-frame state; where each is evaluated (A3.5). *planned*
 6. `design/06-check-and-error-budget.md` — the rotating-frame
