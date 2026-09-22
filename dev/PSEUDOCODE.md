@@ -37,9 +37,14 @@ design section it implements, status.
      `tests/integration/test_rfsim_cli.py`.
    Suite section 4. *inherited*
 
-<!-- SKELETON: the tool's first section is number 1. When a
-placeholder file is replaced, move its name from row 0 to the row
-that now governs it, in the same edit. -->
+1. [`pseudocode/01-frame-and-transform.md`](
+   pseudocode/01-frame-and-transform.md) — governs `core/frame.py`
+   and `tests/unit/test_frame.py`: the `Frame`, Rodrigues' rotation,
+   the transforms, the launch conversion, the triads. Design 1.
+   *draft*
+
+<!-- When a placeholder file is replaced, move its name from row 0
+to the row that now governs it, in the same edit. -->
 
 Status is one of: planned, draft, reviewed, implemented, superseded,
 inherited.
