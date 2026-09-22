@@ -51,6 +51,12 @@ design section it implements, status.
    — governs `forces/force_interface.py`, `forces/fields.py`, and
    `tests/unit/test_fields.py`: the contract, the three members,
    `make_field`, the approximation note. Design 3. *draft*
+4. [`pseudocode/04-motion-and-stopping.md`](
+   pseudocode/04-motion-and-stopping.md) — governs
+   `motion/closed_forms.py`, `motion/equations_of_motion.py`,
+   `motion/integrators.py`, `motion/stopping.py`,
+   `motion/motion_provider.py`, and their tests, with the drop
+   oracle as an integration test. Design 4. *draft*
 
 <!-- When a placeholder file is replaced, move its name from row 0
 to the row that now governs it, in the same edit. -->
