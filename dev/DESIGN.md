@@ -45,9 +45,10 @@ of Section 1.
    path that scales it, energy and the Jacobi integral, the three
    columns never combined, the first-order deflections (P3, A3.6).
    *draft*
-7. `design/07-launches-and-the-ring.md` — a launch in either frame,
-   the ring toward a common point, the local axes at the launch
-   point (A3.3). *planned*
+7. [`design/07-launches-and-the-ring.md`](
+   design/07-launches-and-the-ring.md) — the launch point and local
+   axes each preset supplies, a launch in either frame as offsets
+   and a velocity, the ring, what is refused (A3.3). *draft*
 8. `design/08-run-file.md` — the TOML schema, units, validation,
    precedence, write-back, the results store (A3.7, A6.4, A7).
    *planned*
