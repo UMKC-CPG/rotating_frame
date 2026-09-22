@@ -57,6 +57,10 @@ design section it implements, status.
    `motion/integrators.py`, `motion/stopping.py`,
    `motion/motion_provider.py`, and their tests, with the drop
    oracle as an integration test. Design 4. *draft*
+5. [`pseudocode/05-pseudo-forces.md`](pseudocode/05-pseudo-forces.md)
+   — governs `pseudoforces/terms.py`, `tests/unit/test_terms.py`, and
+   `tests/integration/test_closure.py`: `terms`, `stacked`, `total`,
+   the sign checks, the closure test. Design 5. *draft*
 
 <!-- When a placeholder file is replaced, move its name from row 0
 to the row that now governs it, in the same edit. -->
