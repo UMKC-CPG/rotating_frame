@@ -31,7 +31,7 @@ design section it implements, status.
    - *Extend under this tool's own section when it arrives:*
      `cli/rfsim.py`, `defaults/rfsimrc.py`, `pyproject.toml`.
    - *Placeholders, replace under this tool's own sections:*
-     `core/motion.py`, `run/run_file.py`, `render/palettes.py`,
+     `core/motion.py`, `render/palettes.py`,
      `render/vedo_renderer.py`, `examples/circle.toml`,
      `tests/unit/test_motion.py`,
      `tests/integration/test_rfsim_cli.py`.
@@ -72,6 +72,11 @@ design section it implements, status.
    `launch/launch_spec.py`, `launch/ring.py`, and
    `tests/unit/test_launch.py`: `LaunchSpec`, `resolve_launch`,
    `expand_ring`, the physical refusals. Design 7. *draft*
+8. [`pseudocode/08-run-file.md`](pseudocode/08-run-file.md) —
+   governs `run/schema.py`, `run/rc.py`, `run/run_spec.py`,
+   `run/serialization.py`, `run/results_store.py`, `run/driver.py`,
+   `tests/unit/test_architecture.py`, and the other tests it names;
+   replaces the placeholder `run/run_file.py`. Design 8. *draft*
 
 <!-- When a placeholder file is replaced, move its name from row 0
 to the row that now governs it, in the same edit. -->
