@@ -39,10 +39,12 @@ of Section 1.
    three terms from the rotating-frame state, evaluated once for the
    check and the store; what each view draws; the sign checks and
    the closure test (A3.5). *draft*
-6. `design/06-check-and-error-budget.md` — the rotating-frame
-   integration, the comparison against the transform, energy and the
-   Jacobi integral, what is reported and never combined (P3, A3.6).
-   *planned*
+6. [`design/06-check-and-error-budget.md`](
+   design/06-check-and-error-budget.md) — the rotating-frame
+   integration, the comparison against the transform and the ghost
+   path that scales it, energy and the Jacobi integral, the three
+   columns never combined, the first-order deflections (P3, A3.6).
+   *draft*
 7. `design/07-launches-and-the-ring.md` — a launch in either frame,
    the ring toward a common point, the local axes at the launch
    point (A3.3). *planned*
