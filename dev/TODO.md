@@ -46,7 +46,19 @@ numbering so older cross-references still resolve.
 
 ## DESIGN
 
-- [ ] (D1) The first design section, and the notation table.
+- [ ] (D1–D10) The ten sections the index names, in order; the
+      notation table is written and each section uses it.
+- [ ] (D10) The key bindings follow the scattering tool's scheme
+      (design 12.15 there): every key a Ctrl chord so that vedo's
+      own viewer keys are not shadowed, matched case-sensitively,
+      with a legend drawn in the window. Carry over the shared
+      vocabulary (Ctrl+space play/pause, Ctrl+s / Ctrl+S step,
+      Ctrl+plus / Ctrl+minus speed, Ctrl+r reverse, Ctrl+Home /
+      Ctrl+End, Ctrl+l loop, Ctrl+c palette, Ctrl+w save, Ctrl+h
+      legend, Ctrl+q quit) and the rigid-body tool's display toggles
+      for what is drawn (the vectors, the triads, the trails, the
+      stage), plus this tool's own: which view, which pseudo-force
+      terms, the check overlay.
 
 ---
 
