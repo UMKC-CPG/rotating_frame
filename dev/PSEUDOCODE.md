@@ -61,6 +61,12 @@ design section it implements, status.
    — governs `pseudoforces/terms.py`, `tests/unit/test_terms.py`, and
    `tests/integration/test_closure.py`: `terms`, `stacked`, `total`,
    the sign checks, the closure test. Design 5. *draft*
+6. [`pseudocode/06-check-and-error-budget.md`](
+   pseudocode/06-check-and-error-budget.md) — governs
+   `analysis/comparison.py`, `analysis/ghost_path.py`,
+   `analysis/conservation_monitor.py`,
+   `analysis/closed_form_deflections.py`, `analysis/error_budget.py`,
+   and their tests. Design 6. *draft*
 
 <!-- When a placeholder file is replaced, move its name from row 0
 to the row that now governs it, in the same edit. -->
