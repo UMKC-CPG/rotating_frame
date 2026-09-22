@@ -67,6 +67,11 @@ design section it implements, status.
    `analysis/conservation_monitor.py`,
    `analysis/closed_form_deflections.py`, `analysis/error_budget.py`,
    and their tests. Design 6. *draft*
+7. [`pseudocode/07-launches-and-the-ring.md`](
+   pseudocode/07-launches-and-the-ring.md) — governs
+   `launch/launch_spec.py`, `launch/ring.py`, and
+   `tests/unit/test_launch.py`: `LaunchSpec`, `resolve_launch`,
+   `expand_ring`, the physical refusals. Design 7. *draft*
 
 <!-- When a placeholder file is replaced, move its name from row 0
 to the row that now governs it, in the same edit. -->
