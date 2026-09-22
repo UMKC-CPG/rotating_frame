@@ -53,9 +53,11 @@ of Section 1.
    tables and keys, the schema and its refusals, precedence, the
    resolution to natural units and the write-back, the results store
    and its interface, the driver (A3.7, A6.4, A7). *draft*
-9. `design/09-scene-and-geometry.md` — the two views, the triads,
-   the stage, the trails, the vectors, palettes and the redundancy
-   rule (A3.8, A3.9). *planned*
+9. [`design/09-scene-and-geometry.md`](design/09-scene-and-geometry.md)
+   — the two views and their cameras, the scene description, the
+   triads, the stage, the trails, the arrows and their two stated
+   scales, palettes and the redundancy rule, the panels, the
+   readouts (A3.8, A3.9). *draft*
 10. `design/10-scrubber-and-session.md` — viewing versus run
     controls, the key chords, the loop, the panels (A3.9). *planned*
 
