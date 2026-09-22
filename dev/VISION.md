@@ -4,10 +4,7 @@
 > PSEUDOCODE → Code. This is the top of the chain; it cites nothing
 > above it, and every level below must be consistent with it.
 
-> **Status: DRAFT, 2026-09-22, not yet ratified.** Written as a
-> starting point when the tool was generated from the `physdemo`
-> skeleton; every paragraph is open. Ratify or rewrite it before
-> ARCHITECTURE is begun, and remove this notice then.
+> **Ratified 2026-09-22.**
 
 ---
 
@@ -16,17 +13,18 @@
 This project is an interactive, real-time teaching tool that builds
 physical intuition for **motion seen from a rotating frame** in a
 graduate theoretical-mechanics course. A student chooses a rotating
-frame (a turntable, a merry-go-round, the Earth at a latitude), sets a
-particle moving, and watches the same motion in the inertial frame
-and in the rotating frame side by side, with the centrifugal,
-Coriolis, and Euler terms drawn on the particle as labeled vectors.
+frame (a turntable, a merry-go-round, the Earth at a latitude),
+launches a particle, and watches the same motion in the inertial
+frame and in the rotating frame side by side, with the centrifugal,
+Coriolis, and Euler pseudo-forces drawn on the particle as labeled
+vectors.
 
 The subject has one central image, and the tool exists to deliver
 it. A particle that moves in a straight line at constant speed in the
 inertial frame traces a curve on the turntable, and an observer
 riding the turntable must invent forces to explain the curve. The
-tool shows both pictures at once, so that the "pseudo-forces" are
-seen for what they are: the bookkeeping of a frame that is itself
+tool shows both pictures at once, so that the pseudo-forces are seen
+for what they are: the bookkeeping of a frame that is itself
 accelerating, exactly as large as the frame's rotation demands and
 not one bit more. Rendered as two views of one motion, the equation
 
@@ -50,45 +48,55 @@ frames, is at stake.
    frame's axes drawn and labeled, so that a student can watch a
    straight line become a spiral and back.
 
-2. **Integrate in both frames and show they agree.** Compute the
-   motion in the inertial frame from the true forces, and again in
-   the rotating frame from the true forces plus the pseudo-forces;
-   display the difference. Agreement to the integrator's tolerance is
-   the tool's own proof that the pseudo-forces are complete and
-   correctly signed.
+2. **The inertial frame drives; the rotating frame is a transform.**
+   The motion is computed in the inertial frame from the true forces
+   and carried into the rotating frame by an exact rotation, so that
+   the picture is as accurate as the inertial motion itself. The
+   pseudo-forces are evaluated from that motion and drawn. Alongside,
+   and optionally, the same motion is integrated a second time in the
+   rotating frame from the true forces plus the pseudo-forces, and
+   the difference between the two is displayed. Agreement to the
+   integrator's tolerance is the tool's own proof that the
+   pseudo-forces are complete and correctly signed, and the
+   discrepancy is the disclosed numerical error of Principle 3. With
+   the first version's forces the inertial motion is a closed form,
+   so the comparison is against an exact answer.
 
 3. **Draw every term.** The centrifugal, Coriolis, and (when the
    rotation rate varies) Euler contributions are drawn on the
    particle as separate labeled vectors, with their magnitudes read
    out, so that a student sees which term dominates and when.
 
-4. **Ship the canonical demonstrations as run files.** A free
-   particle on a turntable; a ball thrown across a merry-go-round; a
-   projectile launched at a given latitude, deflected by the
-   Coriolis term; the Foucault pendulum, whose plane precesses at
-   `Ω sin(latitude)`; and a labeled cartoon of why cyclones turn the
-   way they do.
+4. **Ship the canonical demonstrations as run files.** All are freely
+   launched projectiles: a particle sliding on a turntable; a ball
+   thrown across a merry-go-round; a projectile launched at a given
+   latitude and deflected by the Coriolis term; a vertical drop, which
+   lands to the east; and a ring of independent particles launched
+   toward a common point on the turntable, which all veer the same
+   way, the cyclonic sense as a cartoon.
 
 5. **Scrub time in both directions.** Play, pause, step, reverse,
    and jump anywhere in the run, because the run is precomputed and
    the display is a view.
 
 6. **Reproduce any run from a file.** A run is specified completely
-   by a TOML run file: the frame, the rotation rate, the particle,
-   the true forces, the fidelity, and the viewpoint.
+   by a TOML run file: the frame, the rotation rate, the particles
+   and their launches, the force field, the fidelity, and the
+   viewpoint.
 
 7. **Validate against closed forms.** The free particle in a
-   rotating frame, the Foucault precession rate, and the Coriolis
-   deflection of a vertical drop have exact expressions; they are the
-   standard of correctness and form the regression suite.
+   rotating frame is exact; the eastward deflection of a vertical
+   drop and the deflection of a projectile at a latitude are known to
+   the order their closed forms hold. They are the standard of
+   correctness, to that order, and form the regression suite.
 
 ---
 
 ## 3. Non-Goals
 
 1. **Fluid dynamics.** Cyclones, trade winds, and the bathtub are
-   discussed with a point particle and a labeled cartoon, never
-   simulated as a fluid.
+   discussed with independent particles and a labeled cartoon (Goal
+   4), never simulated as a fluid.
 
 2. **Relativistic rotation.** The frame rotates slowly enough that
    Galilean kinematics is exact.
@@ -98,24 +106,39 @@ frames, is at stake.
    the origin, and a moving axis, are anticipated (Future Direction
    1) and must not be foreclosed, but are not built first.
 
-4. **Many-body dynamics.** One particle, or a few independent ones,
-   in given forces. Interactions between particles belong elsewhere.
+4. **Interacting particles.** A particle, or a ring of them, moves
+   independently in the given force field. Interactions between
+   particles belong elsewhere.
+
+5. **Forces other than none and uniform gravity, in the first
+   version.** Every first-version demonstration is a freely launched
+   projectile. A central attraction, a spring, and the constraint a
+   pendulum needs are anticipated (Future Directions 5 and 6) and the
+   force interface must admit them, but they are not built first.
+
+6. **A batch tier.** The older tools have one because they need large
+   ensembles for statistics. Nothing here does. Headless use is the
+   offscreen capture every tool in the suite provides, and no more.
 
 ---
 
 ## 4. Design Principles
 
 1. **Physical fidelity.** The motion is produced by solving the true
-   equations of motion, never by scripted or faked animation.
+   equations of motion, never by scripted or faked animation. Where
+   a closed-form motion exists it may be used directly, but it must
+   be the exact solution.
 
-2. **The inertial frame is the ground truth.** The rotating-frame
-   integration exists to be compared with it (G2); wherever the two
-   disagree beyond the disclosed numerical error, the rotating-frame
-   code is wrong.
+2. **The inertial frame is the ground truth.** It drives the display;
+   the rotating frame is a coordinate transform of it; a rotating-
+   frame integration is a check (Goal 2), never the source of the
+   picture. Wherever the two disagree beyond the disclosed numerical
+   error, the rotating-frame code is wrong.
 
 3. **Numerical error is disclosed, never disguised.** Energy in the
    inertial frame, the Jacobi integral in the rotating frame, and the
-   difference between the two integrations are monitored and shown.
+   difference between the exact motion and the rotating-frame
+   integration are monitored and shown.
 
 4. **Real-time interactivity.** Changing the rotation rate or the
    launch recomputes the run quickly enough to feel like manipulation.
@@ -131,24 +154,36 @@ frames, is at stake.
    (`CLAUDE.md`).
 
 8. **Start simple, stay extensible.** First the turntable and the
-   free particle; the Earth, the pendulum, and a varying rotation
-   rate follow without a rewrite.
+   free particle; the Earth at a latitude follows in the same
+   version; a varying rotation rate, other forces, and the pendulum
+   follow without a rewrite.
 
-9. **Physics decoupled from presentation.** The two integrations and
-   the pseudo-force terms are independent of the renderer.
+9. **Physics decoupled from presentation.** The motion, the
+   transform, and the pseudo-force terms are independent of the
+   renderer.
 
-10. **The computation method never dictates the simulation.** Where a
-    closed form exists it may be drawn beside the integrated motion,
-    and every consumer sees only the trajectory.
+10. **The computation method never dictates the simulation.** A
+    motion may come from a closed form or from an integrator; every
+    consumer sees only the trajectory.
 
-11. **Explicit physical units at the boundary.** A run file says
-    `omega = "7.292e-5 rad/s"` or `latitude = "39 deg"`; the core may
-    work in scaled units, and the display reports real ones.
+11. **A dimensionless core, with real units at the boundary.** The
+    core works in units of the frame's rotation: times in units of
+    `1/Ω`, lengths in units of a chosen scale, so that a turntable and
+    the Earth are the same computation and a run is characterized by
+    the launch speed compared with the frame's speed at that radius.
+    Real units enter only through named presets at the input boundary
+    (a turntable, Earth at a latitude), which carry SI dimensions and
+    are reported in them, with the scale factor stated. A student sees
+    physical scale where it means something and is not asked to carry
+    exponents where it does not.
 
 12. **Deliberate distortions are labeled.** The Earth's rotation is
-    too slow to see over a thrown ball's flight; exaggerating Ω to
+    too slow to see over a thrown ball's flight; exaggerating `Ω` to
     make the deflection visible is legitimate, and the factor is
     stated on screen.
+
+13. **One word for the forces.** They are *pseudo-forces* everywhere:
+    on screen, in the run file, in the source, and in these documents.
 
 ---
 
@@ -170,7 +205,7 @@ keeps working in a directory it cannot write.
    and a rate.
 
 2. **A varying rotation rate.** The Euler term is drawn from the
-   start (G3) but the first run files hold Ω fixed; a spun-up
+   start (Goal 3) but the first run files hold `Ω` fixed; a spun-up
    turntable is the natural next scenario.
 
 3. **The plumb line and effective gravity.** Gravity plus the
@@ -180,3 +215,15 @@ keeps working in a directory it cannot write.
 
 4. **The Lagrangian view.** The same pseudo-forces from the
    rotating-frame Lagrangian, for a course that reaches it.
+
+5. **The Foucault pendulum.** The most famous demonstration, and not
+   a free particle: either a bob constrained to a sphere, or the
+   small-angle approximation, in which it is a two-dimensional
+   oscillator with a Coriolis coupling whose plane precesses at
+   `Ω sin(latitude)` in closed form. The small-angle version is the
+   cheap one and the natural first step.
+
+6. **Further force fields.** A central attraction turns the cyclone
+   cartoon into an inflow that spirals in; a spring gives the
+   oscillator of Direction 5. Both are new force objects behind the
+   interface of Non-goal 5 and change nothing downstream.

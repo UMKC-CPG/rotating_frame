@@ -33,8 +33,7 @@ numbering so older cross-references still resolve.
 
 ## VISION
 
-- [ ] (V1–V6) Write `dev/VISION.md`: purpose, goals, non-goals,
-      principles, audience, future directions. Tag `v0.1-vision`.
+(none)
 
 ---
 
@@ -69,5 +68,7 @@ numbering so older cross-references still resolve.
 
 ## ARCHIVE
 
+- [x] (V1–V6) `dev/VISION.md` written and ratified 2026-09-22;
+      tagged `v0.1-vision`.
 - [x] Generated from the physdemo member-tool skeleton; both routes,
       the self-check, and the tests work on the placeholder.
