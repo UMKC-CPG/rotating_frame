@@ -1,0 +1,64 @@
+# Packaging for the second of the two ways this tool reaches a user
+# (dev/ARCHITECTURE.md, "The two ways in"):
+#
+#   Route A, a shared computer: the physdemo suite LINKS the scripts in
+#     src/scripts/ and supplies the environment. Nothing in this file is
+#     used, and the tool is never pip-installed there.
+#   Route B, a personal computer: `pip install` of this repository. pip
+#     reads this file, installs the dependencies below, and creates the
+#     commands on Windows, macOS, and Linux alike.
+#
+# The dependencies are therefore DECLARED here, because on Route B
+# nobody else will supply them. The physdemo suite's requirements.in is
+# the single statement of what the course tools need: the lower bounds
+# below repeat the subset this package imports and must be no tighter
+# than the suite's (physdemo contract C9). To install against a pinned,
+# tested set instead, `pip install -r <physdemo>/requirements.txt` and
+# then this package with `--no-deps`.
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rotating_frame"
+# The version is read from rotating_frame/__init__.py (__version__), the one
+# place it is stated; see [tool.setuptools.dynamic] below.
+dynamic = ["version"]
+description = "Teaching tool for pseudo-forces in a rotating frame"
+requires-python = ">=3.10"
+license = {text = "GPL-3.0-or-later"}
+readme = "README.md"
+dependencies = [
+    "numpy>=2.0",
+    "vedo>=2025.5",
+    "vtk>=9.4",
+    "tomli>=2.0; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+
+# The front doors on Route B. Each command's body is a module inside
+# the package, so that these console scripts and the executable scripts
+# in src/scripts/ run the same code. The key MUST equal the script's
+# file name without .py (contract C5); a test checks it.
+[project.scripts]
+rfsim = "rotating_frame.cli.rfsim:console_main"
+
+[project.urls]
+Repository = "https://github.com/UMKC-CPG/rotating_frame"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "rotating_frame.__version__"}
+
+# The example run files are data inside the package, so that they are
+# installed with it and `rfsim --examples` can find them anywhere.
+[tool.setuptools.package-data]
+"rotating_frame.examples" = ["*.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,18 @@
+# circle.toml -- the skeleton's placeholder run: a point on a circle.
+#
+# A run file is the complete, self-contained description of one run.
+# Anything that can affect the computed result lives here, never only
+# in the rc file, so that handing this file to someone else reproduces
+# the same run on their computer. Replace this file when the tool's
+# own physics arrives; keep the `schema` line.
+
+schema = 1                      # run-file schema version
+
+[motion]
+radius        = 1.0             # scene units
+angular_speed = 1.0             # radians per unit time
+n_steps       = 200             # samples drawn
+dt            = 0.05            # time between samples
+
+[view]
+palette = "light"               # or "dark"
