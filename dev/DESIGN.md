@@ -58,8 +58,10 @@ of Section 1.
    triads, the stage, the trails, the arrows and their two stated
    scales, palettes and the redundancy rule, the panels, the
    readouts (A3.8, A3.9). *draft*
-10. `design/10-scrubber-and-session.md` — viewing versus run
-    controls, the key chords, the loop, the panels (A3.9). *planned*
+10. [`design/10-scrubber-and-session.md`](
+    design/10-scrubber-and-session.md) — viewing versus run controls
+    and the one rule, the session state, the loop, the time slider,
+    every key chord, scripted controls, the invariants (A3.9). *draft*
 
 Status is one of: planned, draft, reviewed, implemented, superseded.
 A superseded section keeps its number and file; its header names the

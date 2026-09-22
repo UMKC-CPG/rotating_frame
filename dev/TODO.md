@@ -46,8 +46,8 @@ numbering so older cross-references still resolve.
 
 ## DESIGN
 
-- [ ] (D1–D10) The ten sections the index names, in order; the
-      notation table is written and each section uses it.
+- [ ] (D1–D10) The ten sections are drafted; a `/refine` pass over
+      the chain, then ratification and the `v0.3-design` tag.
 - [ ] (D10) The key bindings follow the scattering tool's scheme
       (design 12.15 there): every key a Ctrl chord so that vedo's
       own viewer keys are not shadowed, matched case-sensitively,
