@@ -25,9 +25,10 @@ of Section 1.
    design/02-natural-units-and-presets.md) — the scaling by `Ω` and
    `L`, mass per unit, the named presets (turntable, merry-go-round,
    Earth at a latitude), the exaggeration factor (P11, P12). *draft*
-3. `design/03-force-fields.md` — the interface, no force, and the two
-   kinds of uniform gravity; the bare attraction and the plumb line
-   (A3.2, A4.2). *planned*
+3. [`design/03-force-fields.md`](design/03-force-fields.md) — the
+   interface, no force, and the two kinds of uniform gravity; the
+   bare attraction and the plumb line; where the uniform
+   approximation holds and its error (A3.2, A4.2). *draft*
 4. `design/04-motion-and-stopping.md` — the closed forms (line,
    parabola, rotating-vector parabola), the integrators for the
    check and for future fields, the stopping rules (A3.4, A6.2).
