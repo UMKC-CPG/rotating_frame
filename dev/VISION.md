@@ -4,7 +4,11 @@
 > PSEUDOCODE → Code. This is the top of the chain; it cites nothing
 > above it, and every level below must be consistent with it.
 
-> **Ratified 2026-09-22.**
+> **Ratified 2026-09-22; Goal 4, Non-goal 5, and Future Directions
+> 3 and 6 revised the same day** to state how the Earth's gravity is
+> modeled (the uniform approximation of a central field, with the bare
+> attraction as its magnitude), after the point was raised while
+> writing ARCHITECTURE.
 
 ---
 
@@ -73,7 +77,13 @@ frames, is at stake.
    latitude and deflected by the Coriolis term; a vertical drop, which
    lands to the east; and a ring of independent particles launched
    toward a common point on the turntable, which all veer the same
-   way, the cyclonic sense as a cartoon.
+   way, the cyclonic sense as a cartoon. The Earth runs model its
+   gravity as the textbooks do: the central field is replaced by a
+   uniform one at the launch point, whose magnitude is the bare
+   attraction, so that the centrifugal term the tool draws is not
+   counted twice and the tilted, slightly weaker effective gravity
+   (the plumb line) emerges from the two together. The run says so on
+   screen, with the condition under which it holds.
 
 5. **Scrub time in both directions.** Play, pause, step, reverse,
    and jump anywhere in the run, because the run is precomputed and
@@ -112,9 +122,10 @@ frames, is at stake.
 
 5. **Forces other than none and uniform gravity, in the first
    version.** Every first-version demonstration is a freely launched
-   projectile. A central attraction, a spring, and the constraint a
-   pendulum needs are anticipated (Future Directions 5 and 6) and the
-   force interface must admit them, but they are not built first.
+   projectile, and the Earth's gravity is uniform by approximation
+   (Goal 4). Central gravity, a spring, and the constraint a pendulum
+   needs are anticipated (Future Directions 5 and 6) and the force
+   interface must admit them, but they are not built first.
 
 6. **A batch tier.** The older tools have one because they need large
    ensembles for statistics. Nothing here does. Headless use is the
@@ -208,10 +219,12 @@ keeps working in a directory it cannot write.
    start (Goal 3) but the first run files hold `Ω` fixed; a spun-up
    turntable is the natural next scenario.
 
-3. **The plumb line and effective gravity.** Gravity plus the
-   centrifugal term at a latitude defines the local vertical; showing
-   the plumb line's tilt against the true radial direction connects
-   to the Earth's oblateness.
+3. **The Earth's shape.** The first version already shows the plumb
+   line: the bare attraction plus the centrifugal term at a latitude
+   is the local vertical, tilted against the radial direction (Goal
+   4). What it does not show is that the Earth's surface has settled
+   perpendicular to that plumb line, which is its oblateness; a
+   later version can draw the ellipsoid and the level surface.
 
 4. **The Lagrangian view.** The same pseudo-forces from the
    rotating-frame Lagrangian, for a course that reaches it.
@@ -223,7 +236,10 @@ keeps working in a directory it cannot write.
    `Ω sin(latitude)` in closed form. The small-angle version is the
    cheap one and the natural first step.
 
-6. **Further force fields.** A central attraction turns the cyclone
+6. **Further force fields.** Central gravity, the field the Earth
+   actually has, shows where the uniform approximation of Goal 4
+   fails and turns a long projectile flight into an arc of a Kepler
+   ellipse; a central attraction on the turntable turns the cyclone
    cartoon into an inflow that spirals in; a spring gives the
-   oscillator of Direction 5. Both are new force objects behind the
+   oscillator of Direction 5. All are new force objects behind the
    interface of Non-goal 5 and change nothing downstream.

@@ -39,8 +39,6 @@ numbering so older cross-references still resolve.
 
 ## ARCHITECTURE
 
-- [ ] (A2–A5) The structural idea, the module map, the dependency
-      graph, and the boundaries, from VISION. Tag `v0.2-architecture`.
 - [ ] (A9) Replace the placeholder run in `README.md` ("What It Will
       Do") once VISION is ratified.
 
@@ -70,5 +68,7 @@ numbering so older cross-references still resolve.
 
 - [x] (V1–V6) `dev/VISION.md` written and ratified 2026-09-22;
       tagged `v0.1-vision`.
+- [x] (A2–A6) `dev/ARCHITECTURE.md` written and ratified 2026-09-22;
+      tagged `v0.2-architecture`.
 - [x] Generated from the physdemo member-tool skeleton; both routes,
       the self-check, and the tests work on the placeholder.
