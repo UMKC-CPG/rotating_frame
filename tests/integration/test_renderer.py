@@ -57,6 +57,33 @@ def test_two_views_draw_and_change_between_samples(offscreen_context,
     assert not np.array_equal(first, later)
 
 
+def test_dynamic_actors_are_kept_between_frames(offscreen_context,
+                                                turntable):
+    from rotating_frame.render.vedo_renderer import TwoViewRenderer
+    spec, store = turntable
+    renderer = TwoViewRenderer((320, 240), True, 2, 'light')
+    render_at(renderer, spec, store, state(k=0))
+    pool_before = {key: entry.actors[0] for key, entry
+                   in renderer.pool[1].entries.items()}
+    count_before = renderer.plotter.renderers[1].GetActors() \
+        .GetNumberOfItems()
+    later = render_at(renderer, spec, store, state(k=20))
+    pool_after = renderer.pool[1].entries
+    arrows = [key for key in pool_before if key[0] == 'arrow']
+    assert arrows
+    for key in arrows:
+        assert pool_after[key].actors[0] is pool_before[key]
+    assert renderer.plotter.renderers[1].GetActors().GetNumberOfItems() \
+        == count_before
+    assert later.min() != later.max()
+    render_at(renderer, spec, store,
+              state(k=20, arrows=frozenset({'coriolis'})))
+    assert [key for key in renderer.pool[1].entries
+            if key[0] == 'arrow'] == \
+        [('arrow', 'coriolis', 0)]
+    renderer.close()
+
+
 def test_one_view_and_the_panel_strip(offscreen_context, turntable):
     from rotating_frame.render.vedo_renderer import TwoViewRenderer
     spec, store = turntable

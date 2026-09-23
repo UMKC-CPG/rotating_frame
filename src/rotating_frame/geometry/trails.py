@@ -22,13 +22,22 @@ def trail(store, particle, sample, view):
     return positions[particle, :last], f'trail_{particle % TRAIL_ROLES}'
 
 
-def extra_trails(store, spec, particle, sample, shown):
-    """The check's path, the ghost path, and the first-order overlay
-    for `particle` through `sample`, rotating components, as a list of
-    (points, role, style, label) for those that the store holds and
-    `shown` names ("check", "ghost", "overlay")."""
+def ghost_now(store, spec, particle, sample):
+    """Where the ghost, the ball the rider expected, is at `sample`:
+    rotating components, past the stop held at the stop."""
     valid = store.valid_samples(particle)
-    last = min(sample, valid - 1) + 1
+    return spec.axes.launch_point + store.ghost[particle,
+                                                min(sample, valid - 1)]
+
+
+def extra_trails(store, spec, particle, shown):
+    """The check's path, the ghost path, and the first-order overlay
+    for `particle`, each whole over its valid samples (design 9.3),
+    rotating components, as a list of (points, role, style, label)
+    for those that the store holds and `shown` names ("check",
+    "ghost", "overlay")."""
+    valid = store.valid_samples(particle)
+    last = valid
     launch_point = spec.axes.launch_point
     extras = []
     if 'check' in shown and store.check_positions is not None:

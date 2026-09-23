@@ -24,8 +24,15 @@ costs nothing per frame after the first.
 On software OpenGL the window size in `rfsimrc.py` is the lever:
 the render time scales with the number of pixels.
 
-The laptop's 5 frames/s, about 200 ms a frame with a GPU, is not the
-render: offscreen here the whole frame costs 318 ms of which 210 ms
-is software rendering. The frame note now splits the frame into
-describe, panels, actors, and render, so the next reading from the
-laptop says where its 200 ms go; record the split here.
+The laptop's 5 frames/s (2026-09-23, before the actor pool) split
+as describe 5, panels 0, actors 90, render 25 ms: the actors, rebuilt
+every frame, were the cost, and the rest of the 200 ms was the timer
+waiting for its next tick after a slow handler. The renderer now
+keeps its dynamic actors between frames and only places them
+(pseudocode 9.5); offscreen here that took the actors from 84 ms to
+15 ms on the Earth throw and 21 ms on the thirteen-particle
+turntable. Record the laptop's reading after the change below.
+
+| computer | window | frames/s | date |
+| --- | --- | --- | --- |
+| the laptop, Windows, with the actor pool | 1280 × 800 | (from the readout) | |

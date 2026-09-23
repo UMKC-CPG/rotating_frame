@@ -7,8 +7,9 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from rotating_frame.geometry import (extra_trails, moving_triad,
-                                     stage_surface, trail, triads)
+from rotating_frame.geometry import (extra_trails, ghost_now,
+                                     moving_triad, stage_surface, trail,
+                                     triads)
 from rotating_frame.run import build_store, load_rc, load_run_file
 
 EXAMPLES = Path(__file__).resolve().parents[2] / 'src' / 'rotating_frame' \
@@ -61,16 +62,19 @@ def test_the_stage_turns_in_the_right_view(runs):
     at_rest = stage_surface(spec, 'inertial', 0.0, 1.0)[0]
     turned = stage_surface(spec, 'inertial', 0.9, 1.0)[0]
     rotation = spec.frame.rotation(0.9)
-    assert np.allclose(turned['points'], at_rest['points'] @ rotation.T,
-                       atol=1e-14)
+    # The points stay at rest; the rotation carries the turn.
+    assert np.array_equal(turned['points'], at_rest['points'])
+    assert np.allclose(at_rest['rotation'], np.eye(3))
+    assert np.allclose(turned['rotation'], rotation, atol=1e-14)
     fixed = stage_surface(spec, 'rotating', 0.9, 1.0)[0]
-    assert np.allclose(fixed['points'], at_rest['points'], atol=1e-14)
+    assert np.allclose(fixed['rotation'], np.eye(3))
     spec, _ = runs['merry_go_round']
     floor_rest = stage_surface(spec, 'rotating', 0.0, 1.0)[0]
     floor_turned = stage_surface(spec, 'rotating', 0.9, 1.0)[0]
     assert floor_rest['role'] == 'floor'
-    assert np.allclose(floor_turned['points'],
-                       floor_rest['points'] @ rotation, atol=1e-14)
+    assert np.allclose(floor_turned['rotation'], rotation.T, atol=1e-14)
+    assert np.allclose(stage_surface(spec, 'inertial', 0.9, 1.0)[0]
+                       ['rotation'], np.eye(3))
     earth, _ = runs['earth_drop']
     ground = stage_surface(earth, 'rotating', 0.0, 1.0)[0]
     assert ground['role'] == 'stage'
@@ -78,6 +82,9 @@ def test_the_stage_turns_in_the_right_view(runs):
     up = earth.axes.up
     assert np.allclose((ground['points'] - ground['points'][0]) @ up, 0.0,
                        atol=1e-9)
+    inertial_ground = stage_surface(earth, 'inertial', 0.9, 1.0)[0]
+    assert np.allclose(inertial_ground['rotation'],
+                       earth.frame.rotation(0.9))
 
 
 def test_trails_stop_at_the_mask(runs):
@@ -89,8 +96,14 @@ def test_trails_stop_at_the_mask(runs):
     assert np.array_equal(points, store.positions_rot[0, :valid])
     short, _ = trail(store, 0, 3, 'inertial')
     assert len(short) == 4
-    extras = extra_trails(store, spec, 0, 5, {'check', 'ghost', 'overlay'})
+    extras = extra_trails(store, spec, 0, {'check', 'ghost', 'overlay'})
     labels = [label for _, _, _, label in extras]
     assert 'check' in labels and 'ghost' in labels
     assert ('first order' in labels) == (store.overlay is not None)
-    assert extra_trails(store, spec, 0, 5, set()) == []
+    for points, _, _, _ in extras:
+        assert len(points) == valid                 # whole paths
+    assert extra_trails(store, spec, 0, set()) == []
+    assert np.allclose(ghost_now(store, spec, 0, 0), spec.axes.launch_point
+                       + store.ghost[0, 0])
+    assert np.allclose(ghost_now(store, spec, 0, 10_000),
+                       spec.axes.launch_point + store.ghost[0, valid - 1])

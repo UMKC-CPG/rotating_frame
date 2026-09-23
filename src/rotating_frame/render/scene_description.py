@@ -27,14 +27,15 @@ import numpy as np
 
 from rotating_frame.core import units
 from rotating_frame.core.natural_units import to_real
-from rotating_frame.geometry import (extra_trails, stage_surface, trail,
-                                     triads)
+from rotating_frame.geometry import (extra_trails, ghost_now,
+                                     stage_surface, trail, triads)
 from rotating_frame.pseudoforces import TERM_NAMES
 
 ARROW_FRACTION = 0.25          # the largest arrow of a group, at launch
 SAME_SCALE_WITHIN = 3.0        # the two scales are made equal within this
 TINY = 1e-30                   # a magnitude taken as zero
 TRACKED_GLYPH_FACTOR = 1.8
+GHOST_GLYPH_FACTOR = 0.7
 READOUT_WIDTH = 62               # characters, for a half-width view
 LABEL_BEYOND = 0.03              # a label sits this far past its tip
 LABEL_CLEARANCE = 0.10           # labels closer than this are spread
@@ -83,11 +84,13 @@ class Triad:
 
 @dataclass(frozen=True)
 class Surface:
-    points: np.ndarray
+    points: np.ndarray            # at rest
     faces: list
     role: str
-    markings: list                # of Polyline
+    markings: list                # of Polyline, at rest
     labels: list = field(default_factory=list)   # of (point, text)
+    rotation: object = None       # (3, 3) turning rest into the view;
+                                  #   identity when None
 
 
 @dataclass(frozen=True)
@@ -333,7 +336,7 @@ def describe_view(store, spec, state, rc, view, legend_lines=(),
         for piece in stage_surface(spec, view, time, scene_extent):
             surfaces.append(Surface(
                 points=piece['points'], faces=piece['faces'],
-                role=piece['role'],
+                role=piece['role'], rotation=piece['rotation'],
                 markings=[Polyline(points=line, role=role, width=1.0)
                           for role, line in piece['markings']],
                 labels=piece['labels']))
@@ -368,10 +371,15 @@ def describe_view(store, spec, state, rc, view, legend_lines=(),
             label=label if is_tracked else None))
     if view == 'rotating':
         for points, role, style, label in extra_trails(store, spec, tracked,
-                                                        sample, state.paths):
+                                                        state.paths):
             dynamic.append(Polyline(points=points - target, role=role,
                                     width=1.0 if style == 'thin' else 1.5,
                                     style=style, label=label))
+        if 'ghost' in state.paths:
+            # The ball the rider expected, where it is now.
+            dynamic.append(Glyph(
+                center=ghost_now(store, spec, tracked, sample) - target,
+                radius=GHOST_GLYPH_FACTOR * glyph_radius, role='ghost'))
     dynamic += arrows(store, spec, tracked, sample, view, info, state.arrows)
     dynamic = spread_labels(dynamic, basis[:, 2], scene_extent)
     dynamic.append(readouts(store, spec, state, info, view, frame_note))

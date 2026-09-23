@@ -9,7 +9,8 @@ of the UMKC Computational Physics Group (GPL-3.0-or-later).
 
 from rotating_frame.geometry.frame_axes import moving_triad, triads
 from rotating_frame.geometry.stage import stage_surface
-from rotating_frame.geometry.trails import extra_trails, trail
+from rotating_frame.geometry.trails import (extra_trails, ghost_now,
+                                            trail)
 
 __all__ = ['moving_triad', 'triads', 'stage_surface', 'extra_trails',
-           'trail']
+           'ghost_now', 'trail']

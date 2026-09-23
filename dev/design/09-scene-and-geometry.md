@@ -129,11 +129,16 @@ so that its rotation can be seen:
 its stored samples `0 … k` in the view's frame, solid, in the
 particle's role; past the particle's stop it ends at the event
 sample. In the rotating view three more polylines may be drawn for
-the tracked particle: the check's path (Design 6.1), dashed; the
-ghost path (Design 6.2), dotted, which is the picture of where the
-rider expected the ball to go; and the first-order overlay (Design
-6.5), thin, where it applies. Each is labeled at its end, so that
-the styles are redundant with words (P6).
+the tracked particle, each whole, over the particle's valid samples,
+since each is a prediction the student compares the trail against:
+the check's path (Design 6.1), dashed; the ghost path (Design 6.2),
+dotted, which is the picture of where the rider expected the ball to
+go, with a small marker at the ghost's own sample `k` so that the
+expected ball and the real one can be compared as they move; and the
+first-order overlay (Design 6.5), thin, where it applies. Each is
+labeled at its end, so that the styles are redundant with words
+(P6). A whole path is also built once and kept between frames, which
+a growing dashed line could not be.
 
 **The glyphs.** A sphere at each particle's sample `k`, radius from
 the rc file as a fraction of `L`; the tracked particle's glyph is

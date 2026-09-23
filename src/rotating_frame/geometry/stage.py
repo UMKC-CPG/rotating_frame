@@ -5,11 +5,13 @@ The turntable is a disc with spokes and a rim; the merry-go-round a
 platform disc flush with the floor, whose grid continues beyond the
 rim; the Earth a square patch of ground through the launch point,
 perpendicular to the plumb line, with a grid and a compass rose. A
-part that belongs to the rotating frame (disc, platform, ground) is
-rotated by `R(t)` in the inertial view; a part that belongs to the
-room (the floor) is rotated by `R(t)^T` in the rotating view. Every
-point is placed relative to the launch point as that view sees it,
-which the caller subtracts.
+part that belongs to the rotating frame (disc, platform, ground)
+turns by `R(t)` in the inertial view; a part that belongs to the room
+(the floor) turns by `R(t)^T` in the rotating view. Each part is
+returned AT REST with its `rotation`, which the renderer applies as
+the actor's matrix, so that a turning stage is one kept actor and
+not a new mesh every frame. Every point is relative to the launch
+point as that view sees it, which the caller subtracts.
 
 Attribution: this module is part of the rotating_frame teaching tool
 of the UMKC Computational Physics Group (GPL-3.0-or-later).
@@ -70,31 +72,34 @@ def _square(side, center, basis):
 
 def stage_surface(spec, view, time, extent):
     """The stage's surfaces as a list of dictionaries, each with
-    `points`, `faces`, `role`, `markings` (a list of (role, points)),
-    and `labels` (a list of (point, text)), all relative to the
-    launch point as this view sees it."""
+    `points` at rest, `faces`, `role`, `rotation` (what turns the rest
+    points into this view's), `markings` (a list of (role, points) at
+    rest), and `labels` (a list of (point, text) at rest), all
+    relative to the launch point as this view sees it."""
     rotation = spec.frame.rotation(time)
     to_view = rotation if view == 'inertial' else np.eye(3)
     room_to_view = np.eye(3) if view == 'inertial' else rotation.T
     name = spec.preset.name
     origin = np.zeros(3)
+    rest = np.eye(3)
     if name == 'turntable':
-        points, faces = _disc(1.0, origin, to_view)
-        markings = _disc_markings(1.0, origin, to_view)
+        points, faces = _disc(1.0, origin, rest)
+        markings = _disc_markings(1.0, origin, rest)
         return [{'points': points, 'faces': faces, 'role': 'stage',
-                 'markings': markings, 'labels': []}]
+                 'rotation': to_view, 'markings': markings, 'labels': []}]
     if name == 'merry_go_round':
-        points, faces = _disc(1.0, origin, to_view)
-        markings = _disc_markings(1.0, origin, to_view)
+        points, faces = _disc(1.0, origin, rest)
+        markings = _disc_markings(1.0, origin, rest)
         floor_points, floor_faces, floor_marks = _square(4.0 * extent,
-                                                         origin, room_to_view)
+                                                         origin, rest)
         return [{'points': floor_points, 'faces': floor_faces,
-                 'role': 'floor', 'markings': floor_marks, 'labels': []},
+                 'role': 'floor', 'rotation': room_to_view,
+                 'markings': floor_marks, 'labels': []},
                 {'points': points, 'faces': faces, 'role': 'stage',
-                 'markings': markings, 'labels': []}]
+                 'rotation': to_view, 'markings': markings, 'labels': []}]
     # The Earth: the ground patch through P, perpendicular to up, in
-    # the local (east, north) plane, rotated with the frame.
-    local = to_view @ spec.axes.basis()
+    # the local (east, north) plane, turning with the frame.
+    local = spec.axes.basis()
     points, faces, markings = _square(4.0 * extent, origin, local)
     markings = [('stage_marks', line) for _, line in markings]
     reach = 1.5 * extent
@@ -106,4 +111,4 @@ def stage_surface(spec, view, time, extent):
                           origin + 2.0 * extent * local[:, 1]))
     markings.append(('rotating_axes', meridian))
     return [{'points': points, 'faces': faces, 'role': 'stage',
-             'markings': markings, 'labels': rose}]
+             'rotation': to_view, 'markings': markings, 'labels': rose}]

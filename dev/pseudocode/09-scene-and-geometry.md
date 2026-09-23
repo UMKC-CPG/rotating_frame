@@ -31,7 +31,10 @@ frozen records, each with `role` naming a palette entry (9.4):
         #   the tip or the last point when None
     Glyph(center (3,), radius, role, label: str | None)
     Triad(origin (3,), axes (3, 3) as columns, role, labels (3 strings))
-    Surface(points (n, 3), faces (m, 3 or 4), role, markings: list of
+    Surface(points (n, 3) AT REST, faces (m, 3 or 4), role,
+            rotation (3, 3): what turns the rest points into the
+            view's, applied by the renderer as the actor's matrix so
+            that a turning stage is one kept actor; markings: list of
             Polyline)
     Text(lines: list of str, corner: "top_left" | "top_right" |
          "bottom_left" | "bottom_right", role)
@@ -94,7 +97,11 @@ function trail(store, i, k, view) -> Polyline:
     points = positions_in[i, :k+1] (inertial) or positions_rot (rotating),
              masked to valid samples; role f"trail_{i % 12}", solid,
              label = the particle's label when i is tracked
-function extra_trails(store, spec, i, k) -> list of Polyline:   # rotating
+function extra_trails(store, spec, i, shown) -> list of Polyline:
+    # rotating view; each path WHOLE over the particle's valid samples
+    #   (design 9.3), so that it is built once and kept
+function ghost_now(store, spec, i, k) -> (3,):   # the ghost's own point
+    launch_point + ghost[i, min(k, valid − 1)]   #   at sample k
     check:   positions_rot^check[i, :k+1], role "check", dashed, "check"
     ghost:   launch_point + ghost[i, :k+1], role "ghost", dotted, "ghost"
     overlay: launch_point + ghost + overlay[i, :k+1], role "overlay",
@@ -172,6 +179,8 @@ function describe_view(store, spec, state, rc, view) -> ViewScene:
               (in the inertial view the stage and the moving triad are
                dynamic, since they turn)
     dynamic = trails for every particle + extra_trails (rotating,
+              whole, and a small Glyph in the ghost role at ghost_now
+              when the ghost is shown) +
               tracked) + glyphs (tracked larger, labeled)
               + arrows(...) + moving triad + readouts
               + [Text(legend lines, "bottom_right")] if state.legend
@@ -239,6 +248,17 @@ class TwoViewRenderer:
         self.shown = False
     method realize(scenes: list of ViewScene, palette_name,
                    strip: Strip | None):
+        # Dynamic actors are KEPT between frames in a pool per view,
+        #   keyed by what would need a rebuild (kind, role, label,
+        #   width, style, radius, and an ordinal among equals), and
+        #   only placed each frame: an arrow is a unit arrow under a
+        #   matrix of rotation, scale, and translation; a glyph and a
+        #   label are moved; a trail's points are reassigned into a
+        #   line of fixed capacity, the tail collapsed onto the last
+        #   point, and rebuilt only when it outgrows the capacity; a
+        #   surface takes its rotation as its matrix; a text block
+        #   takes new text. Keys no longer wanted are removed. This is
+        #   what took a frame from ~90 ms of actors to a few.
         # the strip's images are placed side by side under the flat
         #   camera, a cursor line drawn over each at its fraction of
         #   PLOT_BOX (9.6), and the budget lines as 2D text between
