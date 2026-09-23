@@ -31,8 +31,7 @@ design section it implements, status.
    - *Extend under this tool's own section when it arrives:*
      `cli/rfsim.py`, `defaults/rfsimrc.py`, `pyproject.toml`.
    - *Placeholders, replace under this tool's own sections:*
-     `core/motion.py`, `render/palettes.py`,
-     `render/vedo_renderer.py`, `examples/circle.toml`,
+     `core/motion.py`, `examples/circle.toml`,
      `tests/unit/test_motion.py`,
      `tests/integration/test_rfsim_cli.py`.
    Suite section 4. *inherited*
@@ -77,6 +76,12 @@ design section it implements, status.
    `run/serialization.py`, `run/results_store.py`, `run/driver.py`,
    `tests/unit/test_architecture.py`, and the other tests it names;
    replaces the placeholder `run/run_file.py`. Design 8. *draft*
+9. [`pseudocode/09-scene-and-geometry.md`](
+   pseudocode/09-scene-and-geometry.md) — governs `geometry/`,
+   `render/scene_description.py`, `render/palettes.py`,
+   `render/vedo_renderer.py`, `render/panels.py`, and their tests;
+   replaces the placeholder `render/palettes.py` and
+   `render/vedo_renderer.py`. Design 9. *draft*
 
 <!-- When a placeholder file is replaced, move its name from row 0
 to the row that now governs it, in the same edit. -->
