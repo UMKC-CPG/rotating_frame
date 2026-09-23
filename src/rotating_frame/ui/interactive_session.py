@@ -15,6 +15,8 @@ of the UMKC Computational Physics Group (GPL-3.0-or-later).
 
 import copy
 import sys
+import time
+from collections import deque
 from pathlib import Path
 
 import numpy as np
@@ -22,8 +24,9 @@ import numpy as np
 from rotating_frame.analysis import budget_at
 from rotating_frame.core.natural_units import factor
 from rotating_frame.launch import expand_ring
-from rotating_frame.render.panels import PANEL_NAMES, render_panel
-from rotating_frame.render.scene_description import describe
+from rotating_frame.render.panels import (budget_lines, cursor_fraction,
+                                          render_panel)
+from rotating_frame.render.scene_description import Strip, describe
 from rotating_frame.run import ViewSettings, build_store, resolve
 from rotating_frame.run.serialization import write_resolved
 from rotating_frame.ui.controls import legend_lines
@@ -36,6 +39,8 @@ from rotating_frame.ui.vedo_controls import VedoControls
 TICK_MILLISECONDS = 33               # thirty ticks a second
 ANGLE_STEP_DEG = 15.0
 PANEL_SIZE = (400, 300)
+PLOTTED_PANELS = ('terms', 'conservation')
+FRAME_WINDOW = 30                    # redraws the rate is measured over
 
 
 def _si_text(spec, value_natural, kind, unit):
@@ -67,6 +72,11 @@ class Session:
         self.state = initial_state(spec)
         self.scenes = []
         self.dirty = True
+        self.panel_cache = {}         # (name, id(store), tracked,
+                                      #   palette) -> rgb image
+        self.redrawing = False
+        self.frame_stamps = deque(maxlen=FRAME_WINDOW)
+        self.last_frame_seconds = None
 
     # -- commands ---------------------------------------------------
 
@@ -173,6 +183,7 @@ class Session:
             print(f'note: {command}: {problem}', file=sys.stderr)
             return
         self.spec, self.store = new_spec, new_store
+        self.panel_cache.clear()      # the images were of the old run
         self.state = transition(self.state, 'set_sample', self.store,
                                 self.state.k)
         self.dirty = True
@@ -205,27 +216,56 @@ class Session:
 
     # -- drawing ----------------------------------------------------
 
+    def frame_note(self):
+        """The drawing rate over the last redraws, once there are
+        two, so that a slow display is seen and not guessed."""
+        if len(self.frame_stamps) < 2:
+            return None
+        span = self.frame_stamps[-1] - self.frame_stamps[0]
+        if span <= 0.0:
+            return None
+        rate = (len(self.frame_stamps) - 1) / span
+        return (f'drawing {rate:.1f} frames/s '
+                f'({1000.0 * self.last_frame_seconds:.0f} ms per frame)')
+
+    def plotted_panel(self, name):
+        """A plotted panel's image, drawn once per run, tracked
+        particle, and palette, and kept (design 9.6)."""
+        state = self.state
+        key = (name, id(self.store), state.tracked, state.palette)
+        if key not in self.panel_cache:
+            self.panel_cache[key] = render_panel(name, self.store,
+                                                 state.tracked, state.palette,
+                                                 size=PANEL_SIZE)
+        return self.panel_cache[key]
+
+    def strip(self):
+        """What the panel strip shows at this sample."""
+        state = self.state
+        sample = min(state.k, self.store.valid_samples(state.tracked) - 1)
+        comparison = (None if self.store.comparison is None
+                      else self.store.comparison[state.tracked])
+        budget = budget_at(comparison, self.store.conserved[state.tracked],
+                           self.spec.field, self.spec, sample,
+                           self.scenes[-1].info)
+        cursor = cursor_fraction(self.store, state.tracked, state.k)
+        return Strip(images=[(self.plotted_panel(name), cursor)
+                             for name in PLOTTED_PANELS],
+                     lines=tuple(budget_lines(budget)))
+
     def redraw(self):
+        started = time.perf_counter()
         state = self.state
         self.scenes = describe(self.store, self.spec, state, self.rc,
-                               legend_lines() if state.legend else ())
-        images = []
-        if state.panels:
-            sample = min(state.k,
-                         self.store.valid_samples(state.tracked) - 1)
-            comparison = (None if self.store.comparison is None
-                          else self.store.comparison[state.tracked])
-            budget = budget_at(comparison,
-                               self.store.conserved[state.tracked],
-                               self.spec.field, self.spec, sample,
-                               self.scenes[-1].info)
-            images = [render_panel(name, self.store, state.tracked, sample,
-                                   state.palette, budget=budget,
-                                   size=PANEL_SIZE)
-                      for name in PANEL_NAMES]
-        self.renderer.realize(self.scenes, state.palette, images)
+                               legend_lines() if state.legend else (),
+                               self.frame_note())
+        strip = self.strip() if state.panels else None
+        self.renderer.realize(self.scenes, state.palette, strip)
         self.renderer.set_slider(state.k)
         self.dirty = False
+        finished = time.perf_counter()
+        self.last_frame_seconds = finished - started
+        self.frame_stamps.append(finished)
 
     def apply_cameras(self):
         """Place every view's camera as the run file says."""
@@ -236,14 +276,23 @@ class Session:
                                      scene.info)
 
     def on_tick(self, tick_number):
-        for command, argument in self.controls.commands_at(tick_number):
-            self.handle(command, argument)
-        advanced = tick(self.state, self.store)
-        if advanced != self.state:
-            self.state = advanced
-            self.dirty = True
-        if self.dirty:
-            self.redraw()
+        if self.redrawing:
+            # A timer event that arrives while a frame is still being
+            # drawn is dropped, never queued; the keys stay in the
+            # controls' queue for the next tick.
+            return
+        self.redrawing = True
+        try:
+            for command, argument in self.controls.commands_at(tick_number):
+                self.handle(command, argument)
+            advanced = tick(self.state, self.store)
+            if advanced != self.state:
+                self.state = advanced
+                self.dirty = True
+            if self.dirty:
+                self.redraw()
+        finally:
+            self.redrawing = False
         if self.controls.wants_to_stop():
             self.renderer.stop()
 

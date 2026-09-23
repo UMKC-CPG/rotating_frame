@@ -210,7 +210,8 @@ does, in a strip along the bottom, each with a key to hide it
    for the tracked particle over the whole run, on a log axis when
    they span more than two decades, with a cursor at `t̃_k`;
 2. **the error budget**: the three columns of Design 6.4, as text
-   with the numbers at `t̃_k` and the run's maxima;
+   with the numbers at `t̃_k` and the run's maxima (drawn as text in
+   the strip, not as an image, since it changes with every sample);
 3. **conservation**: the drift of `E` and of `J` along the exact
    path and the check, or the sentence saying why one is not
    reported (Design 6.3).
@@ -218,6 +219,11 @@ does, in a strip along the bottom, each with a key to hide it
 The key legend is not a panel: it is a text block of its own
 (9.7), with its own switch, so that it can be shown while the panel
 strip is hidden.
+
+A plotted panel is drawn once per run, tracked particle, and
+palette, and kept; the cursor is a line drawn over the image. A
+panel that is redrawn every sample costs more than the whole 3D
+scene and would set the frame rate by itself.
 
 ## 9.7 The readouts
 
@@ -236,7 +242,10 @@ A text block in each view's corner, updated per sample:
 - the approximation note of Design 3.4.2, with its number, on the
   Earth;
 - the legend of key chords (Design 10.5), in the lower left, with
-  its own switch.
+  its own switch;
+- the drawing rate, frames per second over the last thirty frames,
+  so that a slow display is seen and not guessed, and the site
+  notes can record a measured number.
 
 Every number is formatted back through the boundary (Design 2.5),
 so the screen never shows a natural-unit value without saying so.

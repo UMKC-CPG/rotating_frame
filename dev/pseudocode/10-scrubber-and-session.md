@@ -218,15 +218,31 @@ class Session:
         print one line naming the path (or the failure)
 
     method redraw():
-        scenes = describe(self.store, self.spec, self.state, self.rc)
-        panels: when state.panels, one image per panel from
-            render_panel(...) with the budget of Pseudocode 6.5 at
-            (tracked, k), handed to the renderer for its strip (9.5)
-        self.renderer.realize(scenes, self.state.palette, panel images)
+        started = wall clock
+        frame_note = "drawing R frames/s (M ms per frame)" from the
+            last thirty redraws' wall-clock stamps, once there are two
+        scenes = describe(self.store, self.spec, self.state, self.rc,
+                          legend lines when shown, frame_note)
+        strip = None
+        if state.panels:
+            key = (id(self.store), tracked, palette)
+            terms, conservation = self.panel_cache[key], rendered on the
+                first miss with render_panel (9.6) and kept: matplotlib
+                costs hundreds of milliseconds a panel and the images
+                change only with the run, the tracked particle, or the
+                palette; run_control clears the cache
+            cursor = cursor_fraction(self.store, tracked, k)
+            strip = Strip([(terms, cursor), (conservation, cursor)],
+                          budget_lines(budget of Pseudocode 6.5 at k))
+        self.renderer.realize(scenes, self.state.palette, strip)
         self.renderer.set_slider(self.state.k)      # no-op without one
-        self.dirty = False
+        self.dirty = False; record the wall clock for the frame note
 
     method on_tick(tick):
+        if self.redrawing: return      # a timer event that arrives while
+                                       #   a frame is still drawing is
+                                       #   dropped, never queued: the keys
+                                       #   stay in the controls' queue
         for command, argument in self.controls.commands_at(tick):
             self.handle(command, argument)
         new_state = tick(self.state, self.store)

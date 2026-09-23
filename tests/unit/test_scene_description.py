@@ -179,6 +179,15 @@ def test_labels_are_spread_at_a_landing(runs):
         0.05 * scene.info.extent
 
 
+def test_the_frame_note_is_the_last_readout_line(runs):
+    spec, store = runs['turntable']
+    scenes = describe(store, spec, state(), RC, (),
+                      'drawing 12.0 frames/s (80 ms per frame)')
+    for scene in scenes:
+        readout = [d for d in scene.dynamic if isinstance(d, Text)][0]
+        assert readout.lines[-1].endswith('(80 ms per frame)')
+
+
 def test_extent_is_at_least_one(runs):
     spec, store = runs['turntable']
     assert extent(store, spec) >= 1.0

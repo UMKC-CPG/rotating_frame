@@ -28,6 +28,7 @@ import numpy as np
 import vedo
 
 from rotating_frame.render.palettes import color
+from rotating_frame.render.panels import PLOT_BOX
 from rotating_frame.render.scene_description import (Arrow, Glyph, Image,
                                                      Polyline, Surface,
                                                      Text, Triad)
@@ -39,6 +40,9 @@ ARROW_HEAD_LENGTH = 0.2
 LABEL_SIZE = 0.03                # of the scene's extent
 LEGEND_TEXT_SIZE = 0.45
 LEGEND_POSITION = (0.5, 0.01)    # window fractions of the view
+STRIP_GAP = 20                   # pixels between the strip's images
+STRIP_TEXT_WIDTH = 520           # pixels left for the budget text
+STRIP_TEXT_SIZE = 0.55
 READOUT_TEXT_SIZE = 0.6
 TEXT_POSITIONS = {'top_left': 'top-left', 'top_right': 'top-right',
                   'bottom_left': 'bottom-left',
@@ -211,14 +215,14 @@ class TwoViewRenderer:
         for index in range(MAX_VIEWS + 1):
             self.plotter.at(index).background(background)
 
-    def realize(self, scenes, palette_name, panel_images=()):
-        """Draw the scenes; panel images, if any, go in the strip."""
+    def realize(self, scenes, palette_name, strip=None):
+        """Draw the scenes; `strip` (a Strip, or None) fills the panel
+        strip."""
         if palette_name != self.palette_name:
             self.palette_name = palette_name
             self.static_signature = {}
             self._apply_background()
-        panel_images = list(panel_images)
-        self.set_layout(len(scenes), bool(panel_images))
+        self.set_layout(len(scenes), strip is not None)
         for index, scene in enumerate(scenes):
             view = self.plotter.at(index)
             signature = (scene.view, len(scene.static),
@@ -237,32 +241,59 @@ class TwoViewRenderer:
                 for actor in build_actor(drawable, palette_name,
                                          scene.info.extent)]
             view.add(*self.dynamic_actors[index])
-        self._place_panels(panel_images)
+        self._place_panels(strip)
         if not self.shown:
             self.plotter.show(interactive=False, resetcam=False)
             self.shown = True
         self.plotter.render()
 
-    def _place_panels(self, images):
-        strip = self.plotter.at(MAX_VIEWS)
-        strip.remove(*self.panel_actors)
+    def _place_panels(self, strip):
+        """The strip: the first image, the budget text, the other
+        images, side by side under a flat camera, with a cursor line
+        over each image at its fraction of the plot box."""
+        renderer = self.plotter.at(MAX_VIEWS)
+        renderer.remove(*self.panel_actors)
         self.panel_actors = []
+        if strip is None:
+            return
+        tint = color(self.palette_name, 'text')
+        left, bottom, right, top = PLOT_BOX
         x = 0.0
         height = 0
-        for rgb in images:
+        for position, (rgb, cursor) in enumerate(strip.images):
+            if position == 1 and strip.lines:
+                x += STRIP_TEXT_WIDTH
             image = vedo.Image(rgb)
             image.pos(x, 0.0, 0.0)
             self.panel_actors.append(image)
-            x += rgb.shape[1] + 20
-            height = max(height, rgb.shape[0])
-        if self.panel_actors:
-            strip.add(*self.panel_actors)
-            camera = strip.camera
-            camera.ParallelProjectionOn()
-            camera.SetFocalPoint(x / 2.0, height / 2.0, 0.0)
-            camera.SetPosition(x / 2.0, height / 2.0, 1000.0)
-            camera.SetViewUp(0.0, 1.0, 0.0)
-            camera.SetParallelScale(0.55 * height)
+            image_height, image_width = rgb.shape[:2]
+            if cursor is not None:
+                x_cursor = x + (left + cursor * (right - left)) * image_width
+                self.panel_actors.append(vedo.Line(
+                    [(x_cursor, bottom * image_height, 1.0),
+                     (x_cursor, top * image_height, 1.0)]).c(tint).lw(1.5))
+            x += image_width + STRIP_GAP
+            height = max(height, image_height)
+        camera = renderer.camera
+        camera.ParallelProjectionOn()
+        camera.SetFocalPoint(x / 2.0, height / 2.0, 0.0)
+        camera.SetPosition(x / 2.0, height / 2.0, 1000.0)
+        camera.SetViewUp(0.0, 1.0, 0.0)
+        camera.SetParallelScale(0.55 * height)
+        if strip.lines:
+            # The flat camera shows 2 * parallel scale * aspect units
+            # across, centred on x / 2; the text's 2D position is a
+            # fraction of that, so that it starts where the first
+            # image ends whatever the window's proportions.
+            width_px, height_px = self.plotter.renderers[MAX_VIEWS].GetSize()
+            half_width = 0.55 * height * max(width_px, 1) / max(height_px, 1)
+            visible_left = x / 2.0 - half_width
+            text_x = strip.images[0][0].shape[1] + STRIP_GAP
+            text_left = (text_x - visible_left) / (2.0 * half_width)
+            self.panel_actors.append(vedo.Text2D(
+                '\n'.join(strip.lines), pos=(text_left, 0.92),
+                justify='top-left', s=STRIP_TEXT_SIZE, c=tint))
+        renderer.add(*self.panel_actors)
 
     def set_camera(self, view_index, camera, info):
         """Place the view's camera by azimuth, elevation, and distance

@@ -49,6 +49,10 @@ frozen record ViewScene:
     static    list of drawables built once per run
     dynamic   list of drawables rebuilt per sample
     info      SceneInfo
+
+frozen record Strip:                  # what the panel strip shows
+    images    list of (rgb (h, w, 3), cursor_fraction: float | None)
+    lines     tuple of str            # the budget, as text (9.6)
 ```
 
 ## 9.2 `geometry/`
@@ -135,7 +139,10 @@ function arrows(store, spec, i, k, view, info, shown) -> list of Arrow:
     return [Arrow(base, base + scale * vector, role = name, label)
             for name, vector, scale, label in candidates if name in shown]
 
-function readouts(store, spec, state, info, view) -> Text:      # Design 9.7
+function readouts(store, spec, state, info, view, frame_note = None)
+        -> Text:                                              # Design 9.7
+    # frame_note: the session's drawing-rate line (10.4), appended
+    #   last when given, so that a slow display is seen and not guessed
     lines: time (t̃_k, format_real(t_k, "time"), θ_k in degrees);
            for the tracked particle in the rotating view: the launch as
            given (Pseudocode 7.1 spec), position (E, N, U) and speed in
@@ -193,10 +200,12 @@ function describe_view(store, spec, state, rc, view) -> ViewScene:
     #   looks at the origin of the scene.
     return ViewScene(view, static, dynamic, info)
 
-function describe(store, spec, state, rc) -> list of ViewScene:
+function describe(store, spec, state, rc, legend_lines = (),
+                  frame_note = None) -> list of ViewScene:
     views = ("inertial", "rotating") if state.view == "both" else
             (state.view,)
-    return [describe_view(..., v) for v in views]
+    return [describe_view(..., v, legend on the last view, frame_note)
+            for v in views]
 ```
 
 ## 9.4 `render/palettes.py`
@@ -228,7 +237,11 @@ class TwoViewRenderer:
         self.static_actors  = {}      # (view index, id) -> actor
         self.dynamic_actors = {view index: list}
         self.shown = False
-    method realize(scenes: list of ViewScene, palette_name):
+    method realize(scenes: list of ViewScene, palette_name,
+                   strip: Strip | None):
+        # the strip's images are placed side by side under the flat
+        #   camera, a cursor line drawn over each at its fraction of
+        #   PLOT_BOX (9.6), and the budget lines as 2D text between
         for index, scene in enumerate(scenes):
             if the static list changed (a new run, or a toggle):
                 remove the old static actors of this view; build and
@@ -285,26 +298,48 @@ function build_actor(drawable, palette_name) -> vedo object:
                 markings as Lines
     Text     -> vedo.Text2D(joined lines, pos = corner) .c(color)
     Image    -> vedo.Image(rgb) placed at rect (as the scattering
-                renderer places its panels)
+                renderer places its panels); in practice the strip's
+                images arrive through `Strip`, not as drawables
 ```
 
 ## 9.6 `render/panels.py`
 
 ```
 PANEL_NAMES = ("terms", "budget", "conservation")
+PLOT_BOX = (left, bottom, right, top) as figure fractions: where the
+    axes sit in every plotted panel, so that the renderer can place a
+    cursor over the image without matplotlib
 
-function panel_terms(store, i, k, palette) -> Figure:
+function panel_terms(store, i, palette) -> Figure:
     |terms[i, :, j]| for j in TERM_NAMES and |true_force[i, :]| against
-    times; log axis when max/min > 100; a vertical cursor at time_at(i, k)
+    times; log axis when max/min > 100; the x axis exactly the
+    particle's valid times, no margin
 function panel_budget(budget: ErrorBudget, palette) -> Figure:
-    three text columns with the numbers at k and the run's maxima;
-    an empty column reads "—"
-function panel_conservation(conserved, k, palette) -> Figure:
-    the drifts against time with the cursor, or the note sentence
-function render_panel(name, …, size = (400, 300)) -> rgb (h, w, 3):
+    the lines of budget_lines(budget), as text
+function panel_conservation(conserved, palette) -> Figure:
+    the drifts against time, or the note sentence
+function render_panel(name, store, i, palette, budget = None,
+                      size = (400, 300)) -> rgb (h, w, 3):
     FigureCanvasAgg, colors from the palette, background from
     "background"; returns the buffer as uint8
+function cursor_fraction(store, i, k) -> float | None:
+    (time_at(i, k) − t_0) / (t_last − t_0) over the particle's OWN
+    times (time_at over its valid samples: the grid, with the stop's
+    event time last), clipped to [0, 1]; None with fewer than two;
+    the plotted panels use the same times for their x axis, so that
+    the axis ends where the data does
+function budget_lines(budget) -> list of str:
+    the three columns of Design 6.4 as text lines (the numerical
+    column on two, the values at k then the maxima), an empty column
+    reading "none" (the window font has no em dash)
 ```
+
+The plotted images depend on the run, the tracked particle, and the
+palette only, and matplotlib is slow (hundreds of milliseconds a
+panel), so the session keeps them (10.4) and the cursor is a line
+the renderer draws over the image at `cursor_fraction`; the budget,
+which changes with every sample, is text the renderer draws in the
+strip and never an image. `Strip` (9.3) carries the two.
 
 ## 9.7 Verification
 

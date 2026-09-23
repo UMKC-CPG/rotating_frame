@@ -123,6 +123,16 @@ class ViewScene:
     info: SceneInfo
 
 
+@dataclass(frozen=True)
+class Strip:
+    """What the panel strip shows: plotted images, each with the
+    cursor's fraction of its plot box or None, and the budget as
+    text lines (pseudocode 9.6)."""
+
+    images: list
+    lines: tuple
+
+
 def extent(store, spec):
     """The scene's size: the largest displacement from the launch
     point over every valid sample, and at least one."""
@@ -222,8 +232,9 @@ def _format(spec, value_natural, kind, unit=None):
                              unit or display[kind])
 
 
-def readouts(store, spec, state, info, view):
-    """The text block of design 9.7 for this view."""
+def readouts(store, spec, state, info, view, frame_note=None):
+    """The text block of design 9.7 for this view; `frame_note` is
+    the session's drawing-rate line, appended last when given."""
     tracked = state.tracked
     sample = min(state.k, store.valid_samples(tracked) - 1)
     time = store.time_at(tracked, state.k)       # the grid's clock
@@ -278,6 +289,8 @@ def readouts(store, spec, state, info, view):
         lines.append(spec.field.approximation.sentence(spec.duration))
     if spec.overlay_note is not None:
         lines.append(spec.overlay_note)
+    if frame_note:
+        lines.append(frame_note)
     wrapped = []
     for line in lines:
         wrapped += textwrap.wrap(line, READOUT_WIDTH,
@@ -285,7 +298,8 @@ def readouts(store, spec, state, info, view):
     return Text(lines=tuple(wrapped), corner='top_left')
 
 
-def describe_view(store, spec, state, rc, view, legend_lines=()):
+def describe_view(store, spec, state, rc, view, legend_lines=(),
+                  frame_note=None):
     """One view's scene at the session's state (pseudocode 9.3)."""
     scene_extent = extent(store, spec)
     scale_true, scale_pseudo, ratio, scale_velocity = arrow_scales(
@@ -360,18 +374,19 @@ def describe_view(store, spec, state, rc, view, legend_lines=()):
                                     style=style, label=label))
     dynamic += arrows(store, spec, tracked, sample, view, info, state.arrows)
     dynamic = spread_labels(dynamic, basis[:, 2], scene_extent)
-    dynamic.append(readouts(store, spec, state, info, view))
+    dynamic.append(readouts(store, spec, state, info, view, frame_note))
     if state.legend and legend_lines:
         dynamic.append(Text(lines=tuple(legend_lines), corner='bottom_right',
                             role='legend'))
     return ViewScene(view=view, static=static, dynamic=dynamic, info=info)
 
 
-def describe(store, spec, state, rc, legend_lines=()):
+def describe(store, spec, state, rc, legend_lines=(), frame_note=None):
     """The scenes of the views the session shows; the legend, when
     shown, goes on the last view only."""
     views = (('inertial', 'rotating') if state.view == 'both'
              else (state.view,))
     return [describe_view(store, spec, state, rc, view,
-                          legend_lines if view == views[-1] else ())
+                          legend_lines if view == views[-1] else (),
+                          frame_note)
             for view in views]

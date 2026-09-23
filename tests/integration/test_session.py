@@ -211,6 +211,43 @@ def test_cycle_view_and_camera_mode(offscreen_context, rc):
     session.renderer.close()
 
 
+def test_panels_are_cached_and_the_frame_note_appears(offscreen_context,
+                                                      rc):
+    from rotating_frame.render.scene_description import Text
+    session = session_for('merry_go_round', rc, offscreen_context)
+    first = session.plotted_panel('terms')
+    session.handle('step_forward')
+    session.redraw()
+    assert session.plotted_panel('terms') is first        # kept
+    assert len(session.panel_cache) == 2                  # two plots
+    session.handle('cycle_palette')
+    session.redraw()
+    assert len(session.panel_cache) == 4                  # per palette
+    readout = [d for d in session.scenes[0].dynamic
+               if isinstance(d, Text) and d.corner == 'top_left'][0]
+    assert any('frames/s' in line for line in readout.lines)
+    session.handle('substeps_up')                         # a new run
+    assert session.panel_cache == {}
+    session.redraw()
+    assert session.plotted_panel('terms') is not first
+    session.renderer.close()
+
+
+def test_a_tick_during_a_redraw_is_dropped(offscreen_context, rc):
+    session = session_for('turntable', rc, offscreen_context)
+    session.handle('play_pause')
+    ticks_seen = []
+    original = session.redraw
+
+    def nested_redraw():
+        original()
+        ticks_seen.append('drawn')
+        session.on_tick(99)                     # arrives mid-frame
+    session.redraw = nested_redraw
+    session.on_tick(1)
+    assert ticks_seen == ['drawn'] and session.state.k == 1
+
+
 def test_the_scripted_clock_matches_the_state_machine(offscreen_context,
                                                       rc):
     spec, store = load('turntable', rc)

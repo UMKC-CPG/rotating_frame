@@ -9,8 +9,9 @@ import numpy as np
 import pytest
 
 from rotating_frame.analysis import budget_at
-from rotating_frame.render.panels import PANEL_NAMES, render_panel
-from rotating_frame.render.scene_description import describe
+from rotating_frame.render.panels import (budget_lines, cursor_fraction,
+                                          render_panel)
+from rotating_frame.render.scene_description import Strip, describe
 from rotating_frame.run import build_store, load_rc, load_run_file
 
 EXAMPLES = Path(__file__).resolve().parents[2] / 'src' / 'rotating_frame' \
@@ -36,11 +37,11 @@ def turntable():
     return spec, build_store(spec, RC)
 
 
-def render_at(renderer, spec, store, the_state, panels=()):
+def render_at(renderer, spec, store, the_state, strip=None):
     scenes = describe(store, spec, the_state, RC)
     for index, scene in enumerate(scenes):
         renderer.set_camera(index, spec.view.camera, scene.info)
-    renderer.realize(scenes, the_state.palette, panels)
+    renderer.realize(scenes, the_state.palette, strip)
     return renderer.screenshot(as_array=True)
 
 
@@ -62,11 +63,19 @@ def test_one_view_and_the_panel_strip(offscreen_context, turntable):
     budget = budget_at(store.comparison[0], store.conserved[0], spec.field,
                        spec, 0, SimpleNamespace(arrow_ratio=None,
                                                 camera_follows=True))
-    panels = [render_panel(name, store, 0, 0, 'dark', budget=budget,
-                           size=(200, 150)) for name in PANEL_NAMES]
+    cursor = cursor_fraction(store, 0, 10)
+    strip = Strip(images=[(render_panel(name, store, 0, 'dark',
+                                        size=(200, 150)), cursor)
+                          for name in ('terms', 'conservation')],
+                  lines=tuple(budget_lines(budget)))
     renderer = TwoViewRenderer((640, 480), True, 1, 'dark',
                                with_panels=True)
     image = render_at(renderer, spec, store, state(view='rotating',
-                                                   palette='dark'), panels)
-    renderer.close()
+                                                   palette='dark'), strip)
     assert image.min() != image.max()
+    assert renderer.layout == (1, True)
+    without = render_at(renderer, spec, store, state(view='rotating',
+                                                     palette='dark'))
+    assert renderer.layout == (1, False)
+    assert not np.array_equal(image, without)
+    renderer.close()
