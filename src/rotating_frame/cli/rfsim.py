@@ -44,7 +44,8 @@ RC_FILENAME = 'rfsimrc.py'
 # (minus the Python 3.10 TOML backport), and a test keeps the two in
 # agreement. It lives here and not in support.py because it differs
 # per tool and the shared module must not.
-CHECKED_DISTRIBUTIONS = ('numpy', 'vedo', 'vtk')
+CHECKED_DISTRIBUTIONS = ('numpy', 'scipy', 'matplotlib', 'vedo', 'vtk',
+                         'pint', 'tomli_w')
 
 # The fallback of last resort, so that a damaged installation still
 # starts; the shipped defaults/rfsimrc.py is the documented source.

@@ -31,9 +31,13 @@ license = {text = "GPL-3.0-or-later"}
 readme = "README.md"
 dependencies = [
     "numpy>=2.0",
+    "scipy>=1.13",
+    "matplotlib>=3.8",
     "vedo>=2025.5",
     "vtk>=9.4",
+    "pint>=0.24",
     "tomli>=2.0; python_version < '3.11'",
+    "tomli_w>=1.0",
 ]
 
 [project.optional-dependencies]

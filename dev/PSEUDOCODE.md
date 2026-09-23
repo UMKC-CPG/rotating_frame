@@ -46,7 +46,7 @@ design section it implements, status.
    pseudocode/02-natural-units-and-presets.md) — governs
    `core/natural_units.py`, `core/units.py`, `core/presets.py`, and
    their tests: the scales, the pint boundary, the three presets,
-   the launch point and the local axes. Design 2. *reviewed*
+   the launch point and the local axes. Design 2. *implemented*
 3. [`pseudocode/03-force-fields.md`](pseudocode/03-force-fields.md)
    — governs `forces/force_interface.py`, `forces/fields.py`, and
    `tests/unit/test_fields.py`: the contract, the three members,
