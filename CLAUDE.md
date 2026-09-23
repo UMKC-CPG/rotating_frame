@@ -317,11 +317,11 @@ standard error and returns.
 An interactive teaching tool for
 pseudo-forces in a rotating frame,
 generated from the `physdemo` suite's member-tool skeleton
-(`../physdemo/template/`, `github.com/UMKC-CPG/physdemo`). Until
-`dev/VISION.md` is written the tool runs the skeleton's placeholder
-physics (a point on a circle); everything else, the two routes, the
-self-check, the rc and run-file division, and the tests, is real and
-stays.
+(`../physdemo/template/`, `github.com/UMKC-CPG/physdemo`). The
+chain in `dev/` is ratified through pseudocode and every section is
+coded; the skeleton's placeholders are gone. The two routes, the
+self-check, the rc and run-file division, and the inherited tests
+are the suite's and stay.
 
 ## Repository Layout
 
@@ -371,8 +371,8 @@ here: `sdemo` sources the suite's `activate.sh`); and **Route B**,
 ```bash
 sdemo                                # activate the suite (Route A)
 rfsim --check                       # can this computer run and draw?
-rfsim circle                        # a packaged example, by name
-rfsim runs/circle.toml              # the same file, in a clone
+rfsim turntable                     # a packaged example, by name
+rfsim runs/turntable.toml           # the same file, in a clone
 ```
 
 Rules that keep both routes working, and that are tested

@@ -1,14 +1,24 @@
 """The two views realized with vedo, the only module that imports it
 (pseudocode 9.5; design 9.1 and 9.2; ARCHITECTURE 6.5).
 
-One vedo window holds one or two sub-renderers side by side, with
-unshared cameras, and, when panels are shown, a strip along the
-bottom that holds their images under a flat camera. The renderer
-keeps the static actors of each view between frames and replaces the
-dynamic ones, so that a change of sample rebuilds only what moved.
-It offers the session the hooks it needs: the slider, the key
-callback, the timer that counts ticks, the blocking interactive
-loop, the screenshot, and close.
+One vedo window holds three sub-renderers from the start: two views
+side by side with unshared cameras, and a strip along the bottom
+that holds the panel images under a flat camera. `realize` lays the
+viewports out from what it is given, one or two scenes and panel
+images or none, so that a change of view or of the panel switch is
+a change of viewports and never a new window. The renderer keeps the
+static actors of each view between frames and replaces the dynamic
+ones, so that a change of sample rebuilds only what moved. It offers
+the session the hooks it needs: the slider, the key callback, the
+timer that counts ticks, the blocking interactive loop, `stop`, the
+screenshot, and close.
+
+vedo's own key table binds Ctrl+w (this tool's save) and Ctrl+q to
+closing the window, so vedo's default keyboard callbacks are turned
+off before the window is made; the mouse keeps vedo's camera
+interaction, which is the interactor style and not a callback.
+Offscreen there is no interactor: the slider, the keys, and the
+timer are no-ops, and a scripted loop drives the session.
 
 Attribution: this module is part of the rotating_frame teaching tool
 of the UMKC Computational Physics Group (GPL-3.0-or-later).
@@ -23,28 +33,59 @@ from rotating_frame.render.scene_description import (Arrow, Glyph, Image,
                                                      Text, Triad)
 
 PANEL_STRIP_FRACTION = 0.28      # of the window's height
+ARROW_SHAFT = 0.015              # fractions of the arrow's length
+ARROW_HEAD_RADIUS = 0.05
+ARROW_HEAD_LENGTH = 0.2
+LABEL_SIZE = 0.03                # of the scene's extent
+LEGEND_TEXT_SIZE = 0.45
+READOUT_TEXT_SIZE = 0.6
 TEXT_POSITIONS = {'top_left': 'top-left', 'top_right': 'top-right',
                   'bottom_left': 'bottom-left',
                   'bottom_right': 'bottom-right'}
 
 
-def _layout(n_views, with_panels):
-    """The sub-renderers as vedo's custom shapes: the views across the
-    top, and the panel strip along the bottom when asked for."""
+MAX_VIEWS = 2
+
+
+def _viewports(n_views, with_panels):
+    """The three viewports as (xmin, ymin, xmax, ymax) or None for
+    one that is off: the views across the top, the strip along the
+    bottom when asked for."""
     top = PANEL_STRIP_FRACTION if with_panels else 0.0
-    shape = []
-    for index in range(n_views):
-        left = index / n_views
-        right = (index + 1) / n_views
-        shape.append({'bottomleft': (left, top), 'topright': (right, 1.0)})
-    if with_panels:
-        shape.append({'bottomleft': (0.0, 0.0), 'topright': (1.0, top)})
-    return shape
+    ports = []
+    for index in range(MAX_VIEWS):
+        if index < n_views:
+            ports.append((index / n_views, top, (index + 1) / n_views,
+                          1.0))
+        else:
+            ports.append(None)
+    ports.append((0.0, 0.0, 1.0, top) if with_panels else None)
+    return ports
 
 
-def build_actor(drawable, palette_name):
-    """The vedo objects that realize one drawable."""
+def _initial_shape():
+    return [{'bottomleft': (0.0, 0.3), 'topright': (0.5, 1.0)},
+            {'bottomleft': (0.5, 0.3), 'topright': (1.0, 1.0)},
+            {'bottomleft': (0.0, 0.0), 'topright': (1.0, 0.3)}]
+
+
+def _label(text, position, size, tint):
+    """A 3D label that turns to face the camera."""
+    return vedo.Text3D(text, pos=position, s=size, c=tint).follow_camera()
+
+
+def _arrow(base, tip, tint):
+    """An arrow whose shaft and head scale with its length."""
+    return vedo.Arrow(base, tip, shaft_radius=ARROW_SHAFT,
+                      head_radius=ARROW_HEAD_RADIUS,
+                      head_length=ARROW_HEAD_LENGTH, c=tint)
+
+
+def build_actor(drawable, palette_name, extent=1.0):
+    """The vedo objects that realize one drawable; `extent` sizes
+    the labels."""
     tint = lambda role: color(palette_name, role)      # noqa: E731
+    label_size = LABEL_SIZE * extent
     if isinstance(drawable, Polyline):
         points = np.asarray(drawable.points, dtype=float)
         if len(points) < 2:
@@ -62,45 +103,48 @@ def build_actor(drawable, palette_name):
                 drawable.width)
         actors = [actor]
         if drawable.label:
-            actors.append(vedo.Text3D(drawable.label, pos=points[-1],
-                                      s=0.03, c=tint('text')))
+            actors.append(_label(drawable.label, points[-1], label_size,
+                                 tint('text')))
         return actors
     if isinstance(drawable, Arrow):
-        actor = vedo.Arrow(drawable.base, drawable.tip, s=0.004,
-                           c=tint(drawable.role))
-        label = vedo.Text3D(drawable.label, pos=drawable.tip, s=0.03,
-                            c=tint(drawable.role))
-        return [actor, label]
+        return [_arrow(drawable.base, drawable.tip, tint(drawable.role)),
+                _label(drawable.label, drawable.tip, label_size,
+                       tint(drawable.role))]
     if isinstance(drawable, Glyph):
         actors = [vedo.Sphere(pos=drawable.center, r=drawable.radius,
                               res=16).c(tint(drawable.role))]
         if drawable.label:
-            actors.append(vedo.Text3D(drawable.label, pos=drawable.center,
-                                      s=0.03, c=tint('text')))
+            actors.append(_label(drawable.label, drawable.center,
+                                 label_size, tint('text')))
         return actors
     if isinstance(drawable, Triad):
         actors = []
         for column, label in zip(drawable.axes.T, drawable.labels):
             tip = drawable.origin + column
-            actors.append(vedo.Arrow(drawable.origin, tip, s=0.003,
-                                     c=tint(drawable.role)))
-            actors.append(vedo.Text3D(label, pos=tip, s=0.04,
-                                      c=tint(drawable.role)))
+            actors.append(_arrow(drawable.origin, tip, tint(drawable.role)))
+            actors.append(_label(label, tip, 1.3 * label_size,
+                                 tint(drawable.role)))
         return actors
     if isinstance(drawable, Surface):
         mesh = vedo.Mesh([drawable.points, drawable.faces]).c(
             tint(drawable.role)).alpha(0.5)
         actors = [mesh]
         for marking in drawable.markings:
-            actors += build_actor(marking, palette_name)
+            actors += build_actor(marking, palette_name, extent)
         for point, text in drawable.labels:
-            actors.append(vedo.Text3D(text, pos=point, s=0.05,
-                                      c=tint('stage_marks')))
+            actors.append(_label(text, point, 1.6 * label_size,
+                                 tint('stage_marks')))
         return actors
     if isinstance(drawable, Text):
+        if drawable.role == 'legend':
+            return [vedo.Text2D('\n'.join(drawable.lines),
+                                pos=TEXT_POSITIONS[drawable.corner],
+                                s=LEGEND_TEXT_SIZE, c=tint('text'),
+                                bg=tint('background'), alpha=0.85)]
         return [vedo.Text2D('\n'.join(drawable.lines),
-                            pos=TEXT_POSITIONS[drawable.corner], s=0.6,
-                            c=tint(drawable.role), alpha=0.9)]
+                            pos=TEXT_POSITIONS[drawable.corner],
+                            s=READOUT_TEXT_SIZE, c=tint(drawable.role),
+                            alpha=0.9)]
     if isinstance(drawable, Image):
         return [vedo.Image(drawable.rgb)]
     raise TypeError(f'no actor for {type(drawable).__name__}')
@@ -111,11 +155,10 @@ class TwoViewRenderer:
 
     def __init__(self, window_size, offscreen, n_views, palette_name,
                  title='rfsim', with_panels=False):
-        self.n_views = n_views
-        self.with_panels = with_panels
         self.palette_name = palette_name
         self.offscreen = offscreen
-        self.plotter = vedo.Plotter(shape=_layout(n_views, with_panels),
+        vedo.settings.enable_default_keyboard_callbacks = False
+        self.plotter = vedo.Plotter(shape=_initial_shape(),
                                     size=tuple(window_size),
                                     offscreen=offscreen, sharecam=False,
                                     title=title)
@@ -126,11 +169,32 @@ class TwoViewRenderer:
         self.slider = None
         self.tick_count = 0
         self.shown = False
+        self.layout = None
+        self.set_layout(n_views, with_panels)
         self._apply_background()
+
+    @property
+    def interactor(self):
+        return getattr(self.plotter, 'interactor', None)
+
+    def set_layout(self, n_views, with_panels):
+        """Place the viewports; a view or the strip that is off
+        draws nothing."""
+        if self.layout == (n_views, with_panels):
+            return
+        self.layout = (n_views, with_panels)
+        for renderer, port in zip(self.plotter.renderers,
+                                  _viewports(n_views, with_panels)):
+            if port is None:
+                renderer.DrawOff()
+                renderer.SetViewport(0.0, 0.0, 0.001, 0.001)
+            else:
+                renderer.SetViewport(*port)
+                renderer.DrawOn()
 
     def _apply_background(self):
         background = color(self.palette_name, 'background')
-        for index in range(self.n_views + (1 if self.with_panels else 0)):
+        for index in range(MAX_VIEWS + 1):
             self.plotter.at(index).background(background)
 
     def realize(self, scenes, palette_name, panel_images=()):
@@ -139,6 +203,8 @@ class TwoViewRenderer:
             self.palette_name = palette_name
             self.static_signature = {}
             self._apply_background()
+        panel_images = list(panel_images)
+        self.set_layout(len(scenes), bool(panel_images))
         for index, scene in enumerate(scenes):
             view = self.plotter.at(index)
             signature = (scene.view, len(scene.static),
@@ -147,23 +213,24 @@ class TwoViewRenderer:
                 view.remove(*self.static_actors.get(index, []))
                 self.static_actors[index] = [
                     actor for drawable in scene.static
-                    for actor in build_actor(drawable, palette_name)]
+                    for actor in build_actor(drawable, palette_name,
+                                             scene.info.extent)]
                 view.add(*self.static_actors[index])
                 self.static_signature[index] = signature
             view.remove(*self.dynamic_actors.get(index, []))
             self.dynamic_actors[index] = [
                 actor for drawable in scene.dynamic
-                for actor in build_actor(drawable, palette_name)]
+                for actor in build_actor(drawable, palette_name,
+                                         scene.info.extent)]
             view.add(*self.dynamic_actors[index])
-        if self.with_panels:
-            self._place_panels(panel_images)
+        self._place_panels(panel_images)
         if not self.shown:
             self.plotter.show(interactive=False, resetcam=False)
             self.shown = True
         self.plotter.render()
 
     def _place_panels(self, images):
-        strip = self.plotter.at(self.n_views)
+        strip = self.plotter.at(MAX_VIEWS)
         strip.remove(*self.panel_actors)
         self.panel_actors = []
         x = 0.0
@@ -201,7 +268,11 @@ class TwoViewRenderer:
         self.plotter.at(view_index).renderer.ResetCameraClippingRange()
 
     def add_slider(self, callback, n_samples):
-        """The time slider along the bottom of the first view."""
+        """The time slider along the bottom of the first view; none
+        offscreen."""
+        if self.interactor is None:
+            return None
+
         def on_slide(widget, event):
             callback(widget.value)
         self.slider = self.plotter.at(0).add_slider(
@@ -215,6 +286,10 @@ class TwoViewRenderer:
             self.slider.value = value
 
     def on_key(self, handler):
+        """Call `handler(key)` with the key as vedo names it."""
+        if self.interactor is None:
+            return
+
         def on_press(event):
             if event.keypress:
                 handler(event.keypress)
@@ -222,6 +297,9 @@ class TwoViewRenderer:
 
     def on_tick(self, handler, milliseconds):
         """Call `handler(tick)` from vedo's timer, counting from zero."""
+        if self.interactor is None:
+            return
+
         def on_timer(event):
             handler(self.tick_count)
             self.tick_count += 1
@@ -229,7 +307,14 @@ class TwoViewRenderer:
         self.plotter.timer_callback('start', dt=int(milliseconds))
 
     def interactive(self):
-        self.plotter.interactive()
+        """Block until `stop` or the window closes."""
+        if self.interactor is not None:
+            self.plotter.interactive()
+
+    def stop(self):
+        """Leave the interactive loop, from a tick or a key."""
+        if self.interactor is not None:
+            self.plotter.break_interaction()
 
     def screenshot(self, path=None, as_array=False):
         if as_array:

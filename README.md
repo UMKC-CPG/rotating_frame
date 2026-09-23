@@ -8,15 +8,27 @@ skeleton.
 
 ## Status
 
-**Generated from the skeleton; the tool's own chain is not yet
-written.** `rfsim circle` runs the placeholder (a point on a circle)
-so that every route, the self-check, and the tests work from the
-first commit. `dev/VISION.md` is the first thing to write; see
-`dev/TODO.md`.
+**The chain is ratified through pseudocode and every section is
+coded.** `rfsim turntable`, `rfsim merry_go_round`, `rfsim
+earth_drop`, `rfsim earth_throw`, and `rfsim earth_vertical` run the
+packaged examples; `dev/TODO.md` lists what is still open.
 
-## What It Will Do
+## What It Does
 
-- (Write the goals here once `dev/VISION.md` is ratified.)
+- Shows one motion in two views at once: the inertial frame, where
+  the stage turns and the path is what the true force alone makes;
+  and the rotating frame, where the stage stands still and the path
+  bends under the centrifugal, Coriolis, and Euler terms, each drawn
+  as a labeled arrow.
+- Three stages: a turntable, a merry-go-round, and the Earth at a
+  chosen latitude, with a dropped, thrown, or vertically launched
+  projectile, or a ring of them.
+- Draws the ghost path, what a person in an inertial frame would
+  expect, and the check's path, so that the difference between
+  physics and numerics is on screen.
+- Reports an error budget in three columns, numerical,
+  approximation, and distortion, that are never combined.
+- Every key is a Ctrl chord; Ctrl+h shows the legend in the window.
 
 ## Documents
 
@@ -91,9 +103,10 @@ rfsim --check
 ## Running
 
 ```bash
-rfsim circle             # run a packaged example by name
+rfsim turntable          # run a packaged example by name
 rfsim --examples         # copy the example run files here, to edit
-rfsim circle.toml        # run your edited copy
+rfsim earth_drop.toml    # run your edited copy
+rfsim earth_throw --view rotating --set frame.exaggeration=100
 rfsim --write-rc         # copy the window/palette defaults here
 rfsim --help
 ```

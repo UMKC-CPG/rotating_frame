@@ -147,12 +147,14 @@ class VedoControls(ControlsSource):
         renderer.add_slider(lambda value: self.queue.append(
             ("set_sample", int(round(value)))), n_samples)
     method commands_at(tick): drain and return the queue
-    method wants_to_stop(): a "quit" was queued
+    method wants_to_stop(): a "quit" was queued (a flag, kept after
+                            the queue is drained)
 
 class ScriptedControls(ControlsSource):
     constructor (script: list of (tick, command, argument), frames):
-    method commands_at(tick): the script's entries at this tick
-    method wants_to_stop(): tick >= frames
+    method commands_at(tick): the script's entries at this tick, and
+                              remembers that this tick was served
+    method wants_to_stop(): the next tick to serve >= frames
 
 function parse_script(text) -> list of (tick, command, argument):
     # "5:play_pause,20:reverse,40:set_sample=7"; an unknown command
@@ -177,7 +179,9 @@ class Session:
             self.state = transition(self.state, command, self.store,
                                     argument); self.dirty = True
             if command == "reset_camera": self.apply_cameras()
-            if command == "cycle_view": self.rebuild_renderer()
+            # cycle_view and toggle_panels need no rebuild: the
+            #   renderer lays its viewports out from what realize is
+            #   given (9.5)
         elif command in RUN_COMMANDS: self.run_control(command)
         elif command == "save":       self.save()
         # "quit" is read by the loop through wants_to_stop
@@ -186,7 +190,10 @@ class Session:
         words = deep copy of self.spec.words
         if the tracked particle came from a ring:
             expand the ring into explicit [[launch]] tables in `words`
-            (the RingSpec's members in the student's units) and drop
+            (the RingSpec's members as bare numbers, which a run file
+            reads in natural units: a number sent through SI and back
+            is not always the same number in floating point, and the
+            untouched members must reproduce bit for bit) and drop
             [ring], so that one member can be edited and written back
         launch = words["launch"][self.state.tracked]
         if command starts with "speed", "azimuth", or "elevation":
@@ -212,10 +219,10 @@ class Session:
 
     method redraw():
         scenes = describe(self.store, self.spec, self.state, self.rc)
-        panels: for each shown panel an Image drawable appended to the
-            last scene, from render_panel(...) with the budget of
-            Pseudocode 6.5 at (tracked, k)
-        self.renderer.realize(scenes, self.state.palette)
+        panels: when state.panels, one image per panel from
+            render_panel(...) with the budget of Pseudocode 6.5 at
+            (tracked, k), handed to the renderer for its strip (9.5)
+        self.renderer.realize(scenes, self.state.palette, panel images)
         self.renderer.set_slider(self.state.k)      # no-op without one
         self.dirty = False
 
@@ -225,6 +232,10 @@ class Session:
         new_state = tick(self.state, self.store)
         if new_state != self.state: self.state = new_state; self.dirty = True
         if self.dirty: self.redraw()
+        if self.controls.wants_to_stop(): self.renderer.stop()
+
+    method save() writes next to the run: the constructor takes the
+        run file's stem (`run_name`, default "run") for the file name.
 
 function run_session(spec, store, rc, controls, renderer) -> SessionState:
     session = Session(...); session.redraw(); session.apply_cameras()

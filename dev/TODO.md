@@ -58,9 +58,20 @@ numbering so older cross-references still resolve.
 
 ## CODE
 
-- [ ] (P10.6, src/rotating_frame/core/motion.py) Delete the placeholder
+- [x] (P10.6, src/rotating_frame/core/motion.py) Delete the placeholder
       physics, its example, and `tests/unit/test_motion.py` when
       section 10 is coded; the examples of D8.1 replace the example.
+      (Done 2026-09-23 with section 10.)
+- [ ] (P9.5, render/vedo_renderer.py) The legend is right-justified
+      by vedo's corner placement and its background is translucent;
+      left-justify it at a fixed offset and make the background
+      opaque once the window has been seen on a projector.
+- [ ] (P9.3, render/scene_description.py) At a landing, where the
+      arrows are short and share a base, their 3D labels collide;
+      offset the labels along the arrow or draw them as a 2D list.
+- [ ] (tests/integration/test_session.py) The run-control tests each
+      build a store; share one built store per run across the tests
+      to bring the suite back under two minutes.
 - [ ] (P1–P10) Code, in the checkpoint order of ARCHITECTURE 10:
       `v0.5-motion` (P1–P6 and the store's physics half), `v0.6-scene`
       (P8, P9, P10 with the turntable and merry-go-round runs),

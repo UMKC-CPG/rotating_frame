@@ -101,7 +101,7 @@ def test_the_camera_target_follows_or_stays(runs):
     following = describe_view(store, spec, state(k=k), RC, 'inertial')
     fixed = describe_view(store, spec, state(k=k, camera_mode='fixed'), RC,
                           'inertial')
-    time = store.time_at(0, min(k, store.valid_samples(0) - 1))
+    time = store.time_at(0, k)                   # the grid's clock
     assert np.allclose(following.info.camera_target,
                        spec.frame.rotation(time) @ spec.axes.launch_point)
     assert np.allclose(fixed.info.camera_target, spec.axes.launch_point)
@@ -129,7 +129,7 @@ def test_the_moving_triad_is_dynamic_and_the_fixed_one_static(runs):
     static_triads = [d for d in scene.static if isinstance(d, Triad)]
     dynamic_triads = [d for d in scene.dynamic if isinstance(d, Triad)]
     assert len(static_triads) == 1 and len(dynamic_triads) == 1
-    time = store.time_at(0, min(10, store.valid_samples(0) - 1))
+    time = store.time_at(0, 10)                  # the grid's clock
     assert np.allclose(dynamic_triads[0].axes,
                        0.25 * scene.info.extent * spec.frame.rotation(time))
 

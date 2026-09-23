@@ -149,7 +149,15 @@ function describe_view(store, spec, state, rc, view) -> ViewScene:
     # state: the session state of Pseudocode 10.2 (k, tracked, arrows,
     #   paths, scenery, camera_mode, arrow_mode, legend).
     E    = extent(store); info = arrow_scales(...)
-    time = store.time_at(state.tracked, state.k)
+    # arrow_scales takes the view too: the velocity scale is the
+    #   view's own launch speed (on the Earth the inertial velocity is
+    #   the ground's plus the throw; one scale would make one of the
+    #   two arrows invisible or enormous). Nothing is compared across
+    #   the views by the velocity arrow, so nothing is stated.
+    time = store.time_at(state.tracked, state.k)   # the grid's clock:
+        # a stopped particle sits at its stop while the stage and the
+        #   other particles go on; only the particle's own state is
+        #   read at min(k, its valid samples − 1)
     static  = [stage_surface(...) if state.scenery has "stage"]
               + [the fixed triad if "triads"]          # rotating view
               (in the inertial view the stage and the moving triad are
@@ -157,7 +165,9 @@ function describe_view(store, spec, state, rc, view) -> ViewScene:
     dynamic = trails for every particle + extra_trails (rotating,
               tracked) + glyphs (tracked larger, labeled)
               + arrows(...) + moving triad + readouts
-              + [Text(legend lines, "bottom_left")] if state.legend
+              + [Text(legend lines, "bottom_right")] if state.legend
+                #   and this is the last view shown (the legend is
+                #   drawn once, on a translucent background)
     info.camera_target = R(t) r̃_P if (view == "inertial" and
                           state.camera_mode == "follow") else r̃_P at 0
                           (inertial) or r̃_P (rotating)
@@ -227,8 +237,31 @@ class TwoViewRenderer:
         #   from zero and calls handler(tick).
         plotter.add_callback("timer", ...); plotter.timer_callback(...)
     method interactive():      plotter.interactive()      # blocks
+    method stop():             plotter.break_interaction()  # from a
+                               #   tick, when the controls want to stop
     method screenshot(path = None, as_array = False)
     method close()
+```
+
+Three facts learned when this was coded, which the code follows:
+
+- The window holds THREE sub-renderers from the start, two views and
+  the panel strip, each a viewport that `realize` places and turns
+  on or off from the number of scenes and whether panel images were
+  given (`set_layout`). A change of view or of the panel switch is
+  then a change of viewports, never a new window, and the kept
+  static actors and cameras survive it.
+- vedo binds `Ctrl+w` (this tool's save) and `Ctrl+q` to closing the
+  window in its own key table, so the renderer turns vedo's default
+  keyboard callbacks off before the window is made. Plain keys then
+  do nothing but `q`, which is this tool's own quit; the mouse keeps
+  vedo's camera interaction, which is the interactor style and not a
+  callback.
+- Offscreen there is no interactor: `add_slider`, `on_key`, and
+  `on_tick` are no-ops, and the scripted loop of 10.4 drives the
+  session instead.
+
+```
 
 function build_actor(drawable, palette_name) -> vedo object:
     Polyline -> vedo.Line (dashed/dotted: vedo.DashedLine, or a line

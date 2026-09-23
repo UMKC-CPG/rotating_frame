@@ -20,6 +20,7 @@ Attribution: this module is part of the rotating_frame teaching tool
 of the UMKC Computational Physics Group (GPL-3.0-or-later).
 """
 
+import textwrap
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -34,6 +35,7 @@ ARROW_FRACTION = 0.25          # the largest arrow of a group, at launch
 SAME_SCALE_WITHIN = 3.0        # the two scales are made equal within this
 TINY = 1e-30                   # a magnitude taken as zero
 TRACKED_GLYPH_FACTOR = 1.8
+READOUT_WIDTH = 62               # characters, for a half-width view
 ARROW_LABELS = {'true': 'true force', 'centrifugal': 'centrifugal',
                 'coriolis': 'Coriolis', 'euler': 'Euler', 'sum': 'sum',
                 'velocity': 'v'}
@@ -124,8 +126,13 @@ def extent(store, spec):
     return float(max(1.0, largest))
 
 
-def arrow_scales(store, spec, tracked, mode, rc, scene_extent):
-    """The three arrow scales and the stated ratio (design 9.4)."""
+def arrow_scales(store, spec, tracked, mode, rc, scene_extent,
+                 view='rotating'):
+    """The three arrow scales and the stated ratio (design 9.4). The
+    velocity scale is the view's own: on the Earth the inertial
+    velocity is the ground's hundreds of metres a second plus the
+    throw, and one scale for both views would make one of the two
+    arrows invisible or enormous."""
     terms, true_force = store.terms_at(tracked, 0)
     true0 = float(np.linalg.norm(true_force))
     pseudo0 = float(np.max(np.linalg.norm(terms, axis=-1)))
@@ -141,7 +148,8 @@ def arrow_scales(store, spec, tracked, mode, rc, scene_extent):
                 or 1.0 / SAME_SCALE_WITHIN <= ratio <= SAME_SCALE_WITHIN):
             scale_pseudo, ratio = scale_true, None
     _, velocity_in, _, velocity_rot = store.state_at(tracked, 0)
-    speed0 = max(float(np.linalg.norm(velocity_rot)), TINY)
+    velocity0 = velocity_in if view == 'inertial' else velocity_rot
+    speed0 = max(float(np.linalg.norm(velocity0)), TINY)
     scale_velocity = quarter / speed0
     factor = rc.arrow_scale
     return (scale_true * factor, scale_pseudo * factor, ratio,
@@ -184,7 +192,7 @@ def readouts(store, spec, state, info, view):
     """The text block of design 9.7 for this view."""
     tracked = state.tracked
     sample = min(state.k, store.valid_samples(tracked) - 1)
-    time = store.time_at(tracked, sample)
+    time = store.time_at(tracked, state.k)       # the grid's clock
     lines = [f'{view} view',
              f't = {time:.4g}  ({_format(spec, time, "time")}); '
              f'θ = {np.degrees(spec.frame.angle(time)):.4g}°']
@@ -236,17 +244,24 @@ def readouts(store, spec, state, info, view):
         lines.append(spec.field.approximation.sentence(spec.duration))
     if spec.overlay_note is not None:
         lines.append(spec.overlay_note)
-    return Text(lines=tuple(lines), corner='top_left')
+    wrapped = []
+    for line in lines:
+        wrapped += textwrap.wrap(line, READOUT_WIDTH,
+                                 subsequent_indent='  ') or ['']
+    return Text(lines=tuple(wrapped), corner='top_left')
 
 
 def describe_view(store, spec, state, rc, view, legend_lines=()):
     """One view's scene at the session's state (pseudocode 9.3)."""
     scene_extent = extent(store, spec)
     scale_true, scale_pseudo, ratio, scale_velocity = arrow_scales(
-        store, spec, state.tracked, state.arrow_mode, rc, scene_extent)
+        store, spec, state.tracked, state.arrow_mode, rc, scene_extent,
+        view)
     tracked = state.tracked
     sample = min(state.k, store.valid_samples(tracked) - 1)
-    time = store.time_at(tracked, sample)
+    # The scene's clock is the grid's: a stopped particle sits at its
+    # stop while the stage and the others go on (pseudocode 9.3).
+    time = store.time_at(tracked, state.k)
     rotation = spec.frame.rotation(time)
     launch_point = spec.axes.launch_point
     follows = view == 'inertial' and state.camera_mode == 'follow'
@@ -312,13 +327,16 @@ def describe_view(store, spec, state, rc, view, legend_lines=()):
     dynamic += arrows(store, spec, tracked, sample, view, info, state.arrows)
     dynamic.append(readouts(store, spec, state, info, view))
     if state.legend and legend_lines:
-        dynamic.append(Text(lines=tuple(legend_lines), corner='bottom_left'))
+        dynamic.append(Text(lines=tuple(legend_lines), corner='bottom_right',
+                            role='legend'))
     return ViewScene(view=view, static=static, dynamic=dynamic, info=info)
 
 
 def describe(store, spec, state, rc, legend_lines=()):
-    """The scenes of the views the session shows."""
+    """The scenes of the views the session shows; the legend, when
+    shown, goes on the last view only."""
     views = (('inertial', 'rotating') if state.view == 'both'
              else (state.view,))
-    return [describe_view(store, spec, state, rc, view, legend_lines)
+    return [describe_view(store, spec, state, rc, view,
+                          legend_lines if view == views[-1] else ())
             for view in views]

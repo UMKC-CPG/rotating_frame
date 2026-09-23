@@ -36,8 +36,6 @@ def altered(**changes):
 
 def test_the_shipped_examples_pass():
     for path in sorted(EXAMPLES.glob('*.toml')):
-        if path.stem == 'circle':               # the placeholder, until
-            continue                            #   section 10 removes it
         validate_raw(tomllib.loads(path.read_text()))
     validate_raw(MINIMAL)
 

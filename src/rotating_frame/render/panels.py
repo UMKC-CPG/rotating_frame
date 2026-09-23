@@ -27,6 +27,7 @@ def _figure(size, palette):
     width, height = size
     figure = Figure(figsize=(width / 100.0, height / 100.0), dpi=100)
     figure.patch.set_facecolor(color(palette, 'background'))
+    figure.subplots_adjust(left=0.2, right=0.97, bottom=0.2, top=0.88)
     return figure
 
 
