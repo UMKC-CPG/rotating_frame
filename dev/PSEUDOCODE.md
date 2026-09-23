@@ -56,11 +56,11 @@ design section it implements, status.
    `motion/closed_forms.py`, `motion/equations_of_motion.py`,
    `motion/integrators.py`, `motion/stopping.py`,
    `motion/motion_provider.py`, and their tests, with the drop
-   oracle as an integration test. Design 4. *reviewed*
+   oracle as an integration test. Design 4. *implemented*
 5. [`pseudocode/05-pseudo-forces.md`](pseudocode/05-pseudo-forces.md)
    — governs `pseudoforces/terms.py`, `tests/unit/test_terms.py`, and
    `tests/integration/test_closure.py`: `terms`, `stacked`, `total`,
-   the sign checks, the closure test. Design 5. *reviewed*
+   the sign checks, the closure test. Design 5. *implemented*
 6. [`pseudocode/06-check-and-error-budget.md`](
    pseudocode/06-check-and-error-budget.md) — governs
    `analysis/comparison.py`, `analysis/ghost_path.py`,

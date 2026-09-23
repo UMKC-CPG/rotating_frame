@@ -7,7 +7,8 @@
 > `render/palettes.py`, `render/vedo_renderer.py`, `render/panels.py`,
 > and the tests `tests/unit/test_geometry.py`,
 > `test_scene_description.py`, `test_palettes.py`, `test_panels.py`,
-> and `tests/integration/test_renderer.py`. *Status: reviewed; ratified 2026-09-22.*
+> and `tests/integration/test_renderer.py`.
+> *Status: reviewed; ratified 2026-09-22.*
 
 **Replaces the skeleton's placeholders** `render/palettes.py` and
 `render/vedo_renderer.py` (index row 0). `render/offscreen.py` stays

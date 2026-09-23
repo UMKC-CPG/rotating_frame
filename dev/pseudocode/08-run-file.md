@@ -7,7 +7,8 @@
 > and the tests `tests/unit/test_schema.py`, `test_rc.py`,
 > `test_serialization.py`, `test_results_store.py`,
 > `test_architecture.py`, and `tests/integration/test_run_files.py`,
-> `test_determinism.py`, `test_ring_symmetry.py`. *Status: reviewed; ratified 2026-09-22.*
+> `test_determinism.py`, `test_ring_symmetry.py`.
+> *Status: reviewed; ratified 2026-09-22.*
 
 **Replaces the skeleton's placeholder** `run/run_file.py` (index row
 0): its `SCHEMA` table idea and `load_run_file` survive in shape,

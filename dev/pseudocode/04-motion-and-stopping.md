@@ -7,7 +7,8 @@
 > `motion/stopping.py`, `motion/motion_provider.py`, and the tests
 > `tests/unit/test_closed_forms.py`, `test_integrators.py`,
 > `test_stopping.py`, `test_motion_provider.py`, and
-> `tests/integration/test_drop_oracle.py`. *Status: reviewed; ratified 2026-09-22.*
+> `tests/integration/test_drop_oracle.py`.
+> *Status: reviewed; ratified 2026-09-22.*
 
 New code. `motion/` imports `core/`, `forces/`, and `pseudoforces/`
 (Pseudocode 5, for the rotating-frame equation). The state handed to
@@ -277,8 +278,11 @@ function provide(launch, field, frame, duration, samples, rule,
 `test_closed_forms.py`:
 
 - `one_minus_cos` and `theta_minus_sin` against the direct
-  expressions for `θ` in `[0.1, 10]` to `1e-13` relative, which is
-  the direct form's own rounding at `θ = 0.1` (`1e-16 / θ³ × θ`);
+  expressions for `θ` in `[0.1, 10]` to `1e-13` relative plus `1e-15`
+  absolute: the relative part is the direct form's own rounding at
+  `θ = 0.1` (`1e-16 / θ³ × θ`), and the absolute part is the direct
+  form's cancellation near `θ = 2π`, where `1 − cos θ` itself is small
+  (found when the test was first run);
   for `θ = 1e-4` the series equals `θ³/6 (1 − θ²/20)` to `1e-16` and
   the direct difference does not (its error is `3e-8` relative,
   checked against a forty-digit evaluation while this section was
