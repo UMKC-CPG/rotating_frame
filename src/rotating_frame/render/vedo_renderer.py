@@ -24,6 +24,8 @@ Attribution: this module is part of the rotating_frame teaching tool
 of the UMKC Computational Physics Group (GPL-3.0-or-later).
 """
 
+import time
+
 import numpy as np
 import vedo
 
@@ -188,6 +190,8 @@ class TwoViewRenderer:
         self.tick_count = 0
         self.shown = False
         self.layout = None
+        self.last_seconds = {'actors': 0.0, 'render': 0.0}   # of the
+                                                             #   last realize
         self.set_layout(n_views, with_panels)
         self._apply_background()
 
@@ -223,6 +227,7 @@ class TwoViewRenderer:
             self.static_signature = {}
             self._apply_background()
         self.set_layout(len(scenes), strip is not None)
+        started = time.perf_counter()
         for index, scene in enumerate(scenes):
             view = self.plotter.at(index)
             signature = (scene.view, len(scene.static),
@@ -242,10 +247,13 @@ class TwoViewRenderer:
                                          scene.info.extent)]
             view.add(*self.dynamic_actors[index])
         self._place_panels(strip)
+        built = time.perf_counter()
         if not self.shown:
             self.plotter.show(interactive=False, resetcam=False)
             self.shown = True
         self.plotter.render()
+        self.last_seconds = {'actors': built - started,
+                             'render': time.perf_counter() - built}
 
     def _place_panels(self, strip):
         """The strip: the first image, the budget text, the other

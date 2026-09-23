@@ -77,6 +77,7 @@ class Session:
         self.redrawing = False
         self.frame_stamps = deque(maxlen=FRAME_WINDOW)
         self.last_frame_seconds = None
+        self.last_split = {}          # describe, panels, actors, render
 
     # -- commands ---------------------------------------------------
 
@@ -225,8 +226,11 @@ class Session:
         if span <= 0.0:
             return None
         rate = (len(self.frame_stamps) - 1) / span
+        split = ', '.join(f'{name} {1000.0 * seconds:.0f}'
+                          for name, seconds in self.last_split.items())
         return (f'drawing {rate:.1f} frames/s '
-                f'({1000.0 * self.last_frame_seconds:.0f} ms per frame)')
+                f'({1000.0 * self.last_frame_seconds:.0f} ms per frame: '
+                f'{split})')
 
     def plotted_panel(self, name):
         """A plotted panel's image, drawn once per run, tracked
@@ -254,16 +258,26 @@ class Session:
                      lines=tuple(budget_lines(budget)))
 
     def redraw(self):
+        """Draw the frame, timing its four parts for the frame note:
+        describe, panels, actors, render (the last two from the
+        renderer), so that a slow display says where its time goes."""
         started = time.perf_counter()
         state = self.state
         self.scenes = describe(self.store, self.spec, state, self.rc,
                                legend_lines() if state.legend else (),
                                self.frame_note())
+        described = time.perf_counter()
         strip = self.strip() if state.panels else None
+        panels_done = time.perf_counter()
         self.renderer.realize(self.scenes, state.palette, strip)
         self.renderer.set_slider(state.k)
         self.dirty = False
         finished = time.perf_counter()
+        renderer_seconds = getattr(self.renderer, 'last_seconds', {})
+        self.last_split = {'describe': described - started,
+                           'panels': panels_done - described,
+                           'actors': renderer_seconds.get('actors', 0.0),
+                           'render': renderer_seconds.get('render', 0.0)}
         self.last_frame_seconds = finished - started
         self.frame_stamps.append(finished)
 

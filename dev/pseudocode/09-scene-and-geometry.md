@@ -261,6 +261,8 @@ class TwoViewRenderer:
         #   from zero and calls handler(tick).
         plotter.add_callback("timer", ...); plotter.timer_callback(...)
     method interactive():      plotter.interactive()      # blocks
+    last_seconds: {"actors": s, "render": s} of the last realize, for
+                               the session's frame note (10.4)
     method stop():             plotter.break_interaction()  # from a
                                #   tick, when the controls want to stop
     method screenshot(path = None, as_array = False)

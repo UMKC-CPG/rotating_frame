@@ -225,7 +225,13 @@ def test_panels_are_cached_and_the_frame_note_appears(offscreen_context,
     assert len(session.panel_cache) == 4                  # per palette
     readout = [d for d in session.scenes[0].dynamic
                if isinstance(d, Text) and d.corner == 'top_left'][0]
-    assert any('frames/s' in line for line in readout.lines)
+    joined = ' '.join(readout.lines)
+    assert 'frames/s' in joined
+    for part in ('describe', 'panels', 'actors', 'render'):
+        assert part in joined
+    assert set(session.last_split) == {'describe', 'panels', 'actors',
+                                       'render'}
+    assert session.renderer.last_seconds['render'] > 0.0
     session.handle('substeps_up')                         # a new run
     assert session.panel_cache == {}
     session.redraw()

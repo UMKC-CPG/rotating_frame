@@ -19,7 +19,13 @@ costs nothing per frame after the first.
 | --- | --- | --- | --- |
 | Hellbender login node, offscreen, software GL | 1280 × 800 | 3 | 2026-09-23 |
 | the same | 640 × 400 | 6 | 2026-09-23 |
-| instructor's laptop, Windows, a window | 1280 × 800 | (from the readout) | |
+| instructor's laptop, Windows, a window | 1280 × 800 | 5 | 2026-09-23 |
 
 On software OpenGL the window size in `rfsimrc.py` is the lever:
 the render time scales with the number of pixels.
+
+The laptop's 5 frames/s, about 200 ms a frame with a GPU, is not the
+render: offscreen here the whole frame costs 318 ms of which 210 ms
+is software rendering. The frame note now splits the frame into
+describe, panels, actors, and render, so the next reading from the
+laptop says where its 200 ms go; record the split here.

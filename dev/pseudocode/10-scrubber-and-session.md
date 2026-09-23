@@ -219,8 +219,12 @@ class Session:
 
     method redraw():
         started = wall clock
-        frame_note = "drawing R frames/s (M ms per frame)" from the
-            last thirty redraws' wall-clock stamps, once there are two
+        frame_note = "drawing R frames/s (M ms per frame: describe a,
+            panels b, actors c, render d)" from the last thirty redraws'
+            wall-clock stamps, once there are two; the four parts are
+            the last frame's, the first two timed here and the last
+            two read from renderer.last_seconds (9.5), so that a slow
+            display says where its time goes
         scenes = describe(self.store, self.spec, self.state, self.rc,
                           legend lines when shown, frame_note)
         strip = None
