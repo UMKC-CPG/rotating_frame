@@ -161,6 +161,15 @@ function describe_view(store, spec, state, rc, view) -> ViewScene:
     info.camera_target = R(t) r̃_P if (view == "inertial" and
                           state.camera_mode == "follow") else r̃_P at 0
                           (inertial) or r̃_P (rotating)
+    info.camera_basis  = the local (east, north, up) triad as this view
+                          sees it at t (R(t) @ local when following in the
+                          inertial view); the camera's azimuth, elevation,
+                          and up are measured in it
+    # Every point of every drawable is expressed RELATIVE TO the camera
+    #   target (ARCHITECTURE 4.2: the display works relative to the
+    #   launch point), so that VTK's single-precision vertices see
+    #   numbers of order the scene and not R_E / L; the camera then
+    #   looks at the origin of the scene.
     return ViewScene(view, static, dynamic, info)
 
 function describe(store, spec, state, rc) -> list of ViewScene:

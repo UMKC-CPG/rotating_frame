@@ -82,7 +82,7 @@ design section it implements, status.
    `render/scene_description.py`, `render/palettes.py`,
    `render/vedo_renderer.py`, `render/panels.py`, and their tests;
    replaces the placeholder `render/palettes.py` and
-   `render/vedo_renderer.py`. Design 9. *reviewed*
+   `render/vedo_renderer.py`. Design 9. *implemented*
 10. [`pseudocode/10-scrubber-and-session.md`](
     pseudocode/10-scrubber-and-session.md) — governs `ui/`,
     `cli/rfsim.py` (taken over from row 0), and their tests; replaces
