@@ -146,6 +146,11 @@ function load_run_file(path, overrides = (), rc = None) -> RunSpec:
     text = read path                            # OSError -> RunFileError
     data = tomllib.loads(text)                  # TOMLDecodeError -> "
     data = apply_overrides(data, overrides)
+    return resolve(data, rc)
+
+function resolve(data, rc) -> RunSpec:
+    # Everything below; separate so that a run control (Pseudocode
+    #   10.4) can resolve edited words without a file.
     validate_raw(data)                                        # 8.1
     preset = presets.preset(data.frame.preset)
     fill every PRESET default from the preset (rate, length_scale,

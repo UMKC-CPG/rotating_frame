@@ -29,7 +29,8 @@ design section it implements, status.
      `tests/unit/test_installed_copy.py`,
      `tests/unit/test_offscreen.py`.
    - *Extend under this tool's own section when it arrives:*
-     `cli/rfsim.py`, `defaults/rfsimrc.py`, `pyproject.toml`.
+     `defaults/rfsimrc.py`, `pyproject.toml` (`cli/rfsim.py` is now
+     section 10's).
    - *Placeholders, replace under this tool's own sections:*
      `core/motion.py`, `examples/circle.toml`,
      `tests/unit/test_motion.py`,
@@ -82,6 +83,12 @@ design section it implements, status.
    `render/vedo_renderer.py`, `render/panels.py`, and their tests;
    replaces the placeholder `render/palettes.py` and
    `render/vedo_renderer.py`. Design 9. *draft*
+10. [`pseudocode/10-scrubber-and-session.md`](
+    pseudocode/10-scrubber-and-session.md) — governs `ui/`,
+    `cli/rfsim.py` (taken over from row 0), and their tests; replaces
+    the placeholder `tests/integration/test_rfsim_cli.py`; deletes
+    `core/motion.py`, `examples/circle.toml`, and
+    `tests/unit/test_motion.py` when coded. Design 10. *draft*
 
 <!-- When a placeholder file is replaced, move its name from row 0
 to the row that now governs it, in the same edit. -->
