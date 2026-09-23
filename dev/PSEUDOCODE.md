@@ -41,7 +41,7 @@ design section it implements, status.
    pseudocode/01-frame-and-transform.md) — governs `core/frame.py`
    and `tests/unit/test_frame.py`: the `Frame`, Rodrigues' rotation,
    the transforms, the launch conversion, the triads. Design 1.
-   *reviewed*
+   *implemented*
 2. [`pseudocode/02-natural-units-and-presets.md`](
    pseudocode/02-natural-units-and-presets.md) — governs
    `core/natural_units.py`, `core/units.py`, `core/presets.py`, and
