@@ -41,60 +41,62 @@ design section it implements, status.
    pseudocode/01-frame-and-transform.md) — governs `core/frame.py`
    and `tests/unit/test_frame.py`: the `Frame`, Rodrigues' rotation,
    the transforms, the launch conversion, the triads. Design 1.
-   *draft*
+   *reviewed*
 2. [`pseudocode/02-natural-units-and-presets.md`](
    pseudocode/02-natural-units-and-presets.md) — governs
    `core/natural_units.py`, `core/units.py`, `core/presets.py`, and
    their tests: the scales, the pint boundary, the three presets,
-   the launch point and the local axes. Design 2. *draft*
+   the launch point and the local axes. Design 2. *reviewed*
 3. [`pseudocode/03-force-fields.md`](pseudocode/03-force-fields.md)
    — governs `forces/force_interface.py`, `forces/fields.py`, and
    `tests/unit/test_fields.py`: the contract, the three members,
-   `make_field`, the approximation note. Design 3. *draft*
+   `make_field`, the approximation note. Design 3. *reviewed*
 4. [`pseudocode/04-motion-and-stopping.md`](
    pseudocode/04-motion-and-stopping.md) — governs
    `motion/closed_forms.py`, `motion/equations_of_motion.py`,
    `motion/integrators.py`, `motion/stopping.py`,
    `motion/motion_provider.py`, and their tests, with the drop
-   oracle as an integration test. Design 4. *draft*
+   oracle as an integration test. Design 4. *reviewed*
 5. [`pseudocode/05-pseudo-forces.md`](pseudocode/05-pseudo-forces.md)
    — governs `pseudoforces/terms.py`, `tests/unit/test_terms.py`, and
    `tests/integration/test_closure.py`: `terms`, `stacked`, `total`,
-   the sign checks, the closure test. Design 5. *draft*
+   the sign checks, the closure test. Design 5. *reviewed*
 6. [`pseudocode/06-check-and-error-budget.md`](
    pseudocode/06-check-and-error-budget.md) — governs
    `analysis/comparison.py`, `analysis/ghost_path.py`,
    `analysis/conservation_monitor.py`,
    `analysis/closed_form_deflections.py`, `analysis/error_budget.py`,
-   and their tests. Design 6. *draft*
+   and their tests. Design 6. *reviewed*
 7. [`pseudocode/07-launches-and-the-ring.md`](
    pseudocode/07-launches-and-the-ring.md) — governs
    `launch/launch_spec.py`, `launch/ring.py`, and
    `tests/unit/test_launch.py`: `LaunchSpec`, `resolve_launch`,
-   `expand_ring`, the physical refusals. Design 7. *draft*
+   `expand_ring`, the physical refusals. Design 7. *reviewed*
 8. [`pseudocode/08-run-file.md`](pseudocode/08-run-file.md) —
    governs `run/schema.py`, `run/rc.py`, `run/run_spec.py`,
    `run/serialization.py`, `run/results_store.py`, `run/driver.py`,
    `tests/unit/test_architecture.py`, and the other tests it names;
-   replaces the placeholder `run/run_file.py`. Design 8. *draft*
+   replaces the placeholder `run/run_file.py`. Design 8. *reviewed*
 9. [`pseudocode/09-scene-and-geometry.md`](
    pseudocode/09-scene-and-geometry.md) — governs `geometry/`,
    `render/scene_description.py`, `render/palettes.py`,
    `render/vedo_renderer.py`, `render/panels.py`, and their tests;
    replaces the placeholder `render/palettes.py` and
-   `render/vedo_renderer.py`. Design 9. *draft*
+   `render/vedo_renderer.py`. Design 9. *reviewed*
 10. [`pseudocode/10-scrubber-and-session.md`](
     pseudocode/10-scrubber-and-session.md) — governs `ui/`,
     `cli/rfsim.py` (taken over from row 0), and their tests; replaces
     the placeholder `tests/integration/test_rfsim_cli.py`; deletes
     `core/motion.py`, `examples/circle.toml`, and
-    `tests/unit/test_motion.py` when coded. Design 10. *draft*
+    `tests/unit/test_motion.py` when coded. Design 10. *reviewed*
 
 <!-- When a placeholder file is replaced, move its name from row 0
 to the row that now governs it, in the same edit. -->
 
 Status is one of: planned, draft, reviewed, implemented, superseded,
-inherited.
+inherited. All ten sections were reviewed together and ratified on
+2026-09-22 (`v0.4-pseudocode`); a section becomes *implemented* when
+its code and tests exist and pass.
 
 ## Conventions
 

@@ -6,7 +6,7 @@
 > `ui/vedo_controls.py`, `ui/interactive_session.py`, `cli/rfsim.py`,
 > and the tests `tests/unit/test_session_state.py`,
 > `test_controls.py`, `tests/integration/test_session.py`, and
-> `test_rfsim_cli.py`. *Status: draft.*
+> `test_rfsim_cli.py`. *Status: reviewed; ratified 2026-09-22.*
 
 `ui/` is new code. `cli/rfsim.py` is a **graft onto the skeleton's
 extendable file** (index row 0), and `tests/integration/
@@ -41,8 +41,9 @@ frozen record SessionState:            # Design 10.2, every field
 function initial_state(spec) -> SessionState:
     from spec.view (Pseudocode 8.3): k = 0, playing = False,
     direction = +1, rate = 1, loop = False, view = spec.view.views,
-    arrows = spec.view.arrows, paths = {"ghost" if ghost, "check_path"
-    → "check" if check_path, "overlay" if overlay != "off"},
+    arrows = spec.view.arrows, paths = the set holding "ghost" when
+    spec.view.ghost, "check" when spec.view.check_path, and "overlay"
+    when spec.view.overlay != "off",
     scenery from triads and stage, panels, legend, palette, tracked,
     camera_mode = "follow" if camera.follow else "fixed",
     arrow_mode = spec.view.arrow_scale
@@ -139,7 +140,7 @@ abstract class ControlsSource:
     abstract method wants_to_stop() -> bool
 
 class VedoControls(ControlsSource):
-    constructor (renderer):
+    constructor (renderer, n_samples):
         self.queue = []
         renderer.on_key(lambda key: self.queue.append(
             (command_for(key), None)) if command_for(key) else None)
@@ -164,11 +165,12 @@ function parse_script(text) -> list of (tick, command, argument):
 TICK_MILLISECONDS = 33                       # thirty ticks a second
 
 class Session:
-    constructor (spec, store, rc, controls, renderer, palette_name):
+    constructor (spec, store, rc, controls, renderer):
         self.state = initial_state(spec); self.spec = spec
         self.store = store; self.rc = rc; self.controls = controls
         self.renderer = renderer; self.dirty = True
-        self.slider = renderer.add_slider(...) (VedoControls does it)
+        # The slider, when there is one, was made by VedoControls and is
+        #   kept by the renderer; the session moves it with set_slider.
 
     method handle(command, argument):
         if command in VIEWING_COMMANDS:
@@ -214,7 +216,7 @@ class Session:
             last scene, from render_panel(...) with the budget of
             Pseudocode 6.5 at (tracked, k)
         self.renderer.realize(scenes, self.state.palette)
-        self.slider position = self.state.k
+        self.renderer.set_slider(self.state.k)      # no-op without one
         self.dirty = False
 
     method on_tick(tick):
@@ -278,14 +280,15 @@ function main(argv = None) -> int:
         store = build_store(spec, rc, progress = a one-line bar for rings)
     except (RunFileError, UnitsError, FileNotFoundError, ValueError) as p:
         print f"{COMMAND_NAME}: {p}" on stderr; return 2
-    if args.write_resolved: write_resolved(spec, path); return 0
+    if args.write_resolved:
+        write_resolved(spec, args.write_resolved); return 0
     if args.offscreen: prepare_offscreen()
     from render.vedo_renderer import TwoViewRenderer
     renderer = TwoViewRenderer(rc.window_size, args.offscreen, n_views,
                                spec.view.palette, COMMAND_NAME)
     controls = ScriptedControls(parse_script(args.script), args.frames or
                                 last tick + 2) if scripted else
-               VedoControls(renderer)
+               VedoControls(renderer, store.n_samples)
     run_session(spec, store, rc, controls, renderer)
     if args.screenshot: renderer.screenshot(path) guarded as C16 says
     renderer.close(); return 0

@@ -7,7 +7,7 @@
 > and the tests `tests/unit/test_schema.py`, `test_rc.py`,
 > `test_serialization.py`, `test_results_store.py`,
 > `test_architecture.py`, and `tests/integration/test_run_files.py`,
-> `test_determinism.py`, `test_ring_symmetry.py`. *Status: draft.*
+> `test_determinism.py`, `test_ring_symmetry.py`. *Status: reviewed; ratified 2026-09-22.*
 
 **Replaces the skeleton's placeholder** `run/run_file.py` (index row
 0): its `SCHEMA` table idea and `load_run_file` survive in shape,
@@ -188,7 +188,7 @@ function resolve(data, rc) -> RunSpec:
         raise RunFileError(f"run.stop: {stage_rule!r} is not a rule the "
                            f"{preset.name} stage has; one of "
                            f"{preset.stop_rules}")
-    for spec in specs: check_launch(spec, ..., axes, stage_rule)     # 7.3
+    for spec in specs: check_launch(spec, stage_rule)                # 7.3
     launches = [resolve_launch(spec, axes, frame) for spec in specs]
     if view.tracked >= len(launches): raise RunFileError("view.tracked")
     duration = parse(run.duration) / scales.time
@@ -286,7 +286,8 @@ function build_store(spec, rc, progress = None) -> ResultsStore:  # (8.6)
                 spec.check)                                 # 6.1
             comparison[i] = compare(...)                    # 6.1
         conserved[i] = monitor(spec.field, spec.frame, launch state,
-                               inertial, rotating, check or None)   # 6.3
+                               trajectory.times, inertial, rotating,
+                               check or None)                       # 6.3
         if overlay applies (view.overlay != "off" and
                 overlay_applies(spec.frame, spec.duration)):
             overlay[i, :M] = first_order_deflection(spec.frame,

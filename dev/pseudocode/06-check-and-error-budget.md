@@ -7,7 +7,7 @@
 > `analysis/closed_form_deflections.py`, `analysis/error_budget.py`,
 > and the tests `tests/unit/test_comparison.py`, `test_ghost_path.py`,
 > `test_conservation.py`, `test_deflections.py`,
-> `test_error_budget.py`. *Status: draft.*
+> `test_error_budget.py`. *Status: reviewed; ratified 2026-09-22.*
 
 New code. `analysis/` imports `core/`, `forces/`, `motion/`
 (Pseudocode 4's integrators and derivatives), and `pseudoforces/`;
@@ -147,10 +147,11 @@ frozen record Conserved:
     notes                            list of the NOT_CONSERVED sentences
                                      that apply
 
-function monitor(field, frame, launch_in, inertial, rotating, check)
-        -> Conserved:
+function monitor(field, frame, launch_in, times, inertial, rotating,
+                 check) -> Conserved:
     # inertial = (positions_in, velocities_in); rotating likewise;
-    #   check = (positions_rot, velocities_rot) or None.
+    #   check = (positions_rot, velocities_rot) or None; `times` are
+    #   the sample times, needed to carry the check's states out.
     q = scale(frame, field, launch_in, rotating.positions)
     def drift(values): return None if values is None
                               else (values - values[0]) / q

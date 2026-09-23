@@ -3,7 +3,7 @@
 > **Document hierarchy:** VISION → ARCHITECTURE → DESIGN →
 > **PSEUDOCODE** → Code. Implements Design 7. Governs
 > `src/rotating_frame/launch/launch_spec.py`, `launch/ring.py`, and
-> `tests/unit/test_launch.py`. *Status: draft.*
+> `tests/unit/test_launch.py`. *Status: reviewed; ratified 2026-09-22.*
 
 New code. `launch/` imports `core/` (the `Frame` and the presets'
 local axes) and nothing else. Values arriving here are already in
@@ -104,7 +104,7 @@ values it has just resolved, calling one function here so that the
 rules live beside the records they constrain:
 
 ```
-function check_launch(spec, resolved, axes, stage_rule) -> None:
+function check_launch(spec, stage_rule) -> None:
     # Raises ValueError with the key named; the schema turns it into
     #   the run-file error of Pseudocode 8.
     if spec.velocity is not None and spec.speed is not None:

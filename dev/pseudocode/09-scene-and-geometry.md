@@ -7,7 +7,7 @@
 > `render/palettes.py`, `render/vedo_renderer.py`, `render/panels.py`,
 > and the tests `tests/unit/test_geometry.py`,
 > `test_scene_description.py`, `test_palettes.py`, `test_panels.py`,
-> and `tests/integration/test_renderer.py`. *Status: draft.*
+> and `tests/integration/test_renderer.py`. *Status: reviewed; ratified 2026-09-22.*
 
 **Replaces the skeleton's placeholders** `render/palettes.py` and
 `render/vedo_renderer.py` (index row 0). `render/offscreen.py` stays
@@ -60,10 +60,11 @@ function triads(spec, view, time, extent) -> list of Triad:
     length = 0.25 * extent
     origin = launch point in this view (R(t) r̃_P or r̃_P)
     if spec.preset.name == "earth":
-        local = column_stack(spec.axes.east, north, up)
-        fixed = local if view == "rotating" else R(t) @ local
-        moving = (Rᵀ if view == "rotating" else R) applied to `local`
-                 the other way round: the other frame's local axes
+        local  = column_stack(spec.axes.east, north, up)
+        fixed  = local          # this view's own triad, in both views
+        moving = R(t) @ local if view == "inertial" else R(t)ᵀ @ local
+                 # the rider's triad turning, as the room sees it; or
+                 #   the room's copy turning back, as the rider sees it
         also an Arrow at the origin along n̂ (the axis), length,
             role "rotating_axes", label "Ω"
     else:
@@ -208,10 +209,13 @@ class TwoViewRenderer:
     method set_camera(view_index, camera, target):
         # azimuth, elevation, distance about `target`, in the view's
         #   axes; vedo's camera positioned from spherical coordinates
-    method add_slider(callback, n_samples) -> the slider widget
+    method add_slider(callback, n_samples):  makes the widget, keeps it
+    method set_slider(value):  moves the kept widget; no-op without one
     method on_key(handler):   plotter.add_callback("KeyPress", ...)
-    method on_tick(handler, milliseconds):  plotter.add_callback("timer",
-                                            ...); plotter.timer_callback
+    method on_tick(handler, milliseconds):
+        # vedo's timer delivers an event; the adapter counts ticks
+        #   from zero and calls handler(tick).
+        plotter.add_callback("timer", ...); plotter.timer_callback(...)
     method interactive():      plotter.interactive()      # blocks
     method screenshot(path = None, as_array = False)
     method close()

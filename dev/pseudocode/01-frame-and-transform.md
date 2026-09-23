@@ -3,7 +3,7 @@
 > **Document hierarchy:** VISION → ARCHITECTURE → DESIGN →
 > **PSEUDOCODE** → Code. Implements Design 1. Governs
 > `src/rotating_frame/core/frame.py` and its test,
-> `tests/unit/test_frame.py`. *Status: draft.*
+> `tests/unit/test_frame.py`. *Status: reviewed; ratified 2026-09-22.*
 
 New code, not a graft: nothing in the skeleton is replaced by this
 section, and nothing yet calls it. The names below are the names the

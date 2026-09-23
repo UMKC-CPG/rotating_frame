@@ -4,7 +4,7 @@
 > **PSEUDOCODE** → Code. Implements Design 2. Governs
 > `src/rotating_frame/core/natural_units.py`, `core/units.py`,
 > `core/presets.py`, and their tests `tests/unit/test_natural_units.py`,
-> `test_units.py`, `test_presets.py`. *Status: draft.*
+> `test_units.py`, `test_presets.py`. *Status: reviewed; ratified 2026-09-22.*
 
 New code. Three modules with one direction of dependence:
 `units.py` (the pint boundary) is imported by `run/` only; `presets.py`

@@ -7,7 +7,7 @@
 > `motion/stopping.py`, `motion/motion_provider.py`, and the tests
 > `tests/unit/test_closed_forms.py`, `test_integrators.py`,
 > `test_stopping.py`, `test_motion_provider.py`, and
-> `tests/integration/test_drop_oracle.py`. *Status: draft.*
+> `tests/integration/test_drop_oracle.py`. *Status: reviewed; ratified 2026-09-22.*
 
 New code. `motion/` imports `core/`, `forces/`, and `pseudoforces/`
 (Pseudocode 5, for the rotating-frame equation). The state handed to
@@ -265,8 +265,11 @@ function provide(launch, field, frame, duration, samples, rule,
     if event is None:
         return Trajectory(times, positions, velocities, None,
                           zeros(samples, bool))
-    return Trajectory(*apply_event(times, positions, velocities, event),
-                      stop = event)   # (field order as in the record)
+    times, positions, velocities, flag = apply_event(times, positions,
+                                                     velocities, event)
+    return Trajectory(times = times, positions_in = positions,
+                      velocities_in = velocities, stop = event,
+                      is_event_sample = flag)
 ```
 
 ## 4.6 Verification

@@ -52,34 +52,40 @@ numbering so older cross-references still resolve.
 
 ## PSEUDOCODE
 
-- [ ] (P1) The first pseudocode section. Move the placeholder files
-      it replaces out of row 0.
+(none)
 
 ---
 
 ## CODE
 
-- [ ] (src/rotating_frame/core/motion.py) Replace the placeholder physics
-      after P1 exists; delete `tests/unit/test_motion.py` with it.
+- [ ] (P10.6, src/rotating_frame/core/motion.py) Delete the placeholder
+      physics, its example, and `tests/unit/test_motion.py` when
+      section 10 is coded; the examples of D8.1 replace the example.
+- [ ] (P1–P10) Code, in the checkpoint order of ARCHITECTURE 10:
+      `v0.5-motion` (P1–P6 and the store's physics half), `v0.6-scene`
+      (P8, P9, P10 with the turntable and merry-go-round runs),
+      `v0.7-earth` (the Earth presets, the drop, the projectile, the
+      ring), then `v1.0-classroom`.
 
 ---
 
 ## ARCHIVE
 
+- [x] Generated from the physdemo member-tool skeleton; both routes,
+      the self-check, and the tests work on the placeholder.
+- [x] (V1–V6) `dev/VISION.md` written and ratified 2026-09-22; tagged
+      `v0.1-vision`.
+- [x] (A2–A6) `dev/ARCHITECTURE.md` written and ratified 2026-09-22;
+      tagged `v0.2-architecture`.
+- [x] (D1–D10) The ten design sections written, refined (eleven
+      findings, ten applied), and ratified 2026-09-22; tagged
+      `v0.3-design`.
 - [x] (D10) Done in design 10.5: the key bindings follow the scattering
-      tool's scheme (design 12.15 there): every key a Ctrl chord so that
-      vedo's own viewer keys are not shadowed, matched case-sensitively,
-      with a legend drawn in the window. Carry over the shared
-      vocabulary (Ctrl+space play/pause, Ctrl+s / Ctrl+S step, Ctrl+plus
-      / Ctrl+minus speed, Ctrl+r reverse, Ctrl+Home / Ctrl+End, Ctrl+l
-      loop, Ctrl+c palette, Ctrl+w save, Ctrl+h legend, Ctrl+q quit) and
-      the rigid-body tool's display toggles for what is drawn (the
-      vectors, the triads, the trails, the stage), plus this tool's own:
-      which view, which pseudo-force terms, the check overlay. - [x]
-      (V1–V6) `dev/VISION.md` written and ratified 2026-09-22; tagged
-      `v0.1-vision`. - [x] (A2–A6) `dev/ARCHITECTURE.md` written and
-      ratified 2026-09-22; tagged `v0.2-architecture`. - [x] (D1–D10)
-      The ten design sections written, refined (eleven findings, ten
-      applied), and ratified 2026-09-22; tagged `v0.3-design`. - [x]
-      Generated from the physdemo member-tool skeleton; both routes, the
-      self-check, and the tests work on the placeholder.
+      tool's scheme (design 12.15 there), every key a Ctrl chord matched
+      case-sensitively with a legend in the window; the shared
+      vocabulary carried over, the rigid-body tool's display toggles as
+      the model for what is drawn, and this tool's own chords for the
+      view, the terms, and the check overlay.
+- [x] (P1–P10) The ten pseudocode sections written, refined (ten
+      findings, all applied), and ratified 2026-09-22; tagged
+      `v0.4-pseudocode`.

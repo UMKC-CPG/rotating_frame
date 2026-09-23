@@ -3,7 +3,7 @@
 > **Document hierarchy:** VISION → ARCHITECTURE → DESIGN →
 > **PSEUDOCODE** → Code. Implements Design 3. Governs
 > `src/rotating_frame/forces/force_interface.py`, `forces/fields.py`,
-> and `tests/unit/test_fields.py`. *Status: draft.*
+> and `tests/unit/test_fields.py`. *Status: reviewed; ratified 2026-09-22.*
 
 New code. `forces/` imports `core/` (the `Frame` of Pseudocode 1)
 and nothing else. Everything is in natural units per unit mass, and

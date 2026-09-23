@@ -3,7 +3,7 @@
 > **Document hierarchy:** VISION → ARCHITECTURE → DESIGN →
 > **PSEUDOCODE** → Code. Implements Design 5. Governs
 > `src/rotating_frame/pseudoforces/terms.py` and
-> `tests/unit/test_terms.py`. *Status: draft.*
+> `tests/unit/test_terms.py`. *Status: reviewed; ratified 2026-09-22.*
 
 New code. `pseudoforces/` imports `core/` (the `Frame`) and nothing
 else (A5). One module, one function of consequence, two callers that
