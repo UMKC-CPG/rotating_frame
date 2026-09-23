@@ -71,7 +71,7 @@ design section it implements, status.
    pseudocode/07-launches-and-the-ring.md) — governs
    `launch/launch_spec.py`, `launch/ring.py`, and
    `tests/unit/test_launch.py`: `LaunchSpec`, `resolve_launch`,
-   `expand_ring`, the physical refusals. Design 7. *reviewed*
+   `expand_ring`, the physical refusals. Design 7. *implemented*
 8. [`pseudocode/08-run-file.md`](pseudocode/08-run-file.md) —
    governs `run/schema.py`, `run/rc.py`, `run/run_spec.py`,
    `run/serialization.py`, `run/results_store.py`, `run/driver.py`,
