@@ -21,7 +21,7 @@ of the UMKC Computational Physics Group (GPL-3.0-or-later).
 """
 
 import textwrap
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import numpy as np
 
@@ -36,6 +36,10 @@ SAME_SCALE_WITHIN = 3.0        # the two scales are made equal within this
 TINY = 1e-30                   # a magnitude taken as zero
 TRACKED_GLYPH_FACTOR = 1.8
 READOUT_WIDTH = 62               # characters, for a half-width view
+LABEL_BEYOND = 0.03              # a label sits this far past its tip
+LABEL_CLEARANCE = 0.10           # labels closer than this are spread
+LABEL_STEP = 0.07                # by this much along the view's up
+                                 #   (all fractions of the extent)
 ARROW_LABELS = {'true': 'true force', 'centrifugal': 'centrifugal',
                 'coriolis': 'Coriolis', 'euler': 'Euler', 'sum': 'sum',
                 'velocity': 'v'}
@@ -48,6 +52,8 @@ class Polyline:
     width: float = 2.0
     style: str = 'solid'          # solid | dashed | dotted | thin
     label: object = None
+    label_at: object = None       # where the label sits; the last
+                                  #   point when None
 
 
 @dataclass(frozen=True)
@@ -56,6 +62,7 @@ class Arrow:
     tip: np.ndarray
     role: str
     label: str
+    label_at: object = None       # the tip when None
 
 
 @dataclass(frozen=True)
@@ -180,6 +187,33 @@ def arrows(store, spec, particle, sample, view, info, shown):
     return [Arrow(base=base, tip=base + scale * vector, role=name,
                   label=ARROW_LABELS[name])
             for name, vector, scale in candidates if name in shown]
+
+
+def spread_labels(drawables, up, extent):
+    """Give every labeled arrow and polyline a place for its label
+    that clears the others: just past an arrow's tip, at a path's
+    end, and nudged along the view's up until no earlier label is
+    within LABEL_CLEARANCE. At a landing, where every arrow is short
+    and shares a base, the words would otherwise sit on one spot."""
+    placed = []
+    spread = []
+    for drawable in drawables:
+        if isinstance(drawable, Arrow):
+            shaft = drawable.tip - drawable.base
+            length = np.linalg.norm(shaft)
+            direction = shaft / length if length > TINY else up
+            anchor = drawable.tip + LABEL_BEYOND * extent * direction
+        elif isinstance(drawable, Polyline) and drawable.label:
+            anchor = np.asarray(drawable.points[-1], dtype=float)
+        else:
+            spread.append(drawable)
+            continue
+        while any(np.linalg.norm(anchor - other) < LABEL_CLEARANCE * extent
+                  for other in placed):
+            anchor = anchor + LABEL_STEP * extent * up
+        placed.append(anchor)
+        spread.append(replace(drawable, label_at=anchor))
+    return spread
 
 
 def _format(spec, value_natural, kind, unit=None):
@@ -325,6 +359,7 @@ def describe_view(store, spec, state, rc, view, legend_lines=()):
                                     width=1.0 if style == 'thin' else 1.5,
                                     style=style, label=label))
     dynamic += arrows(store, spec, tracked, sample, view, info, state.arrows)
+    dynamic = spread_labels(dynamic, basis[:, 2], scene_extent)
     dynamic.append(readouts(store, spec, state, info, view))
     if state.legend and legend_lines:
         dynamic.append(Text(lines=tuple(legend_lines), corner='bottom_right',

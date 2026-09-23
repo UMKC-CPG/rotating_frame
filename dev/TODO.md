@@ -39,8 +39,8 @@ numbering so older cross-references still resolve.
 
 ## ARCHITECTURE
 
-- [ ] (A9) Replace the placeholder run in `README.md` ("What It Will
-      Do") once VISION is ratified.
+- [x] (A9) Replace the placeholder run in `README.md` ("What It Will
+      Do") once VISION is ratified. (Done 2026-09-23 with section 10.)
 
 ---
 
@@ -62,21 +62,26 @@ numbering so older cross-references still resolve.
       physics, its example, and `tests/unit/test_motion.py` when
       section 10 is coded; the examples of D8.1 replace the example.
       (Done 2026-09-23 with section 10.)
-- [ ] (P9.5, render/vedo_renderer.py) The legend is right-justified
+- [x] (P9.5, render/vedo_renderer.py) The legend is right-justified
       by vedo's corner placement and its background is translucent;
       left-justify it at a fixed offset and make the background
-      opaque once the window has been seen on a projector.
-- [ ] (P9.3, render/scene_description.py) At a landing, where the
+      opaque. (Done 2026-09-23.)
+- [x] (P9.3, render/scene_description.py) At a landing, where the
       arrows are short and share a base, their 3D labels collide;
-      offset the labels along the arrow or draw them as a 2D list.
-- [ ] (tests/integration/test_session.py) The run-control tests each
-      build a store; share one built store per run across the tests
-      to bring the suite back under two minutes.
-- [ ] (P1–P10) Code, in the checkpoint order of ARCHITECTURE 10:
+      `spread_labels` nudges them apart along the view's up. (Done
+      2026-09-23.)
+- [x] (tests/integration/test_session.py) The run-control tests each
+      build a store; share one built store per run across the tests.
+      (Done 2026-09-23.)
+- [x] (P1–P10) Code, in the checkpoint order of ARCHITECTURE 10:
       `v0.5-motion` (P1–P6 and the store's physics half), `v0.6-scene`
       (P8, P9, P10 with the turntable and merry-go-round runs),
       `v0.7-earth` (the Earth presets, the drop, the projectile, the
-      ring), then `v1.0-classroom`.
+      ring). (Tagged 2026-09-23.)
+- [ ] (A10) `v1.0-classroom`: usable in a graduate mechanics course.
+      Needs a session in a real window on Hellbender and on a laptop
+      (the keys, the slider, the timer), the Earth runs judged by the
+      instructor, and a `site/` note with measured frame rates.
 
 ---
 

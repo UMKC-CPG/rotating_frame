@@ -44,10 +44,19 @@ def checksum(store):
     return digest.hexdigest()
 
 
+_BUILT = {}                       # (name, extras) -> (spec, store)
+
+
 def load(name, rc, extra=()):
-    spec = load_run_file(EXAMPLES / f'{name}.toml', SMALL + list(extra),
-                         rc)
-    return spec, build_store(spec, rc)
+    """A run's spec and store, built once per module: a store is
+    read-only and does not depend on the rc's output directory, so
+    every test can share it."""
+    key = (name, tuple(extra))
+    if key not in _BUILT:
+        spec = load_run_file(EXAMPLES / f'{name}.toml',
+                             SMALL + list(extra), rc)
+        _BUILT[key] = (spec, build_store(spec, rc))
+    return _BUILT[key]
 
 
 @pytest.mark.parametrize('name', NAMES)

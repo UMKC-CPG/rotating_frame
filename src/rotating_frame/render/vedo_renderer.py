@@ -38,6 +38,7 @@ ARROW_HEAD_RADIUS = 0.05
 ARROW_HEAD_LENGTH = 0.2
 LABEL_SIZE = 0.03                # of the scene's extent
 LEGEND_TEXT_SIZE = 0.45
+LEGEND_POSITION = (0.5, 0.01)    # window fractions of the view
 READOUT_TEXT_SIZE = 0.6
 TEXT_POSITIONS = {'top_left': 'top-left', 'top_right': 'top-right',
                   'bottom_left': 'bottom-left',
@@ -70,8 +71,14 @@ def _initial_shape():
 
 
 def _label(text, position, size, tint):
-    """A 3D label that turns to face the camera."""
-    return vedo.Text3D(text, pos=position, s=size, c=tint).follow_camera()
+    """A 3D label that turns to face the camera. The text is built at
+    the origin and moved by its actor's position: vedo bakes `pos`
+    into the letters' points, and a camera-following actor turns
+    about its own origin, so a label built in place would swing
+    around the scene's origin instead of standing at its point."""
+    label = vedo.Text3D(text, s=size, c=tint).follow_camera()
+    label.actor.SetPosition(*np.asarray(position, dtype=float))
+    return label
 
 
 def _arrow(base, tip, tint):
@@ -103,12 +110,16 @@ def build_actor(drawable, palette_name, extent=1.0):
                 drawable.width)
         actors = [actor]
         if drawable.label:
-            actors.append(_label(drawable.label, points[-1], label_size,
+            where = (points[-1] if drawable.label_at is None
+                     else drawable.label_at)
+            actors.append(_label(drawable.label, where, label_size,
                                  tint('text')))
         return actors
     if isinstance(drawable, Arrow):
+        where = (drawable.tip if drawable.label_at is None
+                 else drawable.label_at)
         return [_arrow(drawable.base, drawable.tip, tint(drawable.role)),
-                _label(drawable.label, drawable.tip, label_size,
+                _label(drawable.label, where, label_size,
                        tint(drawable.role))]
     if isinstance(drawable, Glyph):
         actors = [vedo.Sphere(pos=drawable.center, r=drawable.radius,
@@ -137,10 +148,13 @@ def build_actor(drawable, palette_name, extent=1.0):
         return actors
     if isinstance(drawable, Text):
         if drawable.role == 'legend':
+            # Left-justified at a fixed offset on an opaque background,
+            # so that the chords line up and the scene never shows
+            # through the words.
             return [vedo.Text2D('\n'.join(drawable.lines),
-                                pos=TEXT_POSITIONS[drawable.corner],
+                                pos=LEGEND_POSITION, justify='bottom-left',
                                 s=LEGEND_TEXT_SIZE, c=tint('text'),
-                                bg=tint('background'), alpha=0.85)]
+                                bg=tint('background'), alpha=1.0)]
         return [vedo.Text2D('\n'.join(drawable.lines),
                             pos=TEXT_POSITIONS[drawable.corner],
                             s=READOUT_TEXT_SIZE, c=tint(drawable.role),

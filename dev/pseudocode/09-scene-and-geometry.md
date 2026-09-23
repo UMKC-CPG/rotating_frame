@@ -25,8 +25,10 @@ matplotlib. Scene coordinates are natural units.
 ```
 frozen records, each with `role` naming a palette entry (9.4):
     Polyline(points (n, 3), role, width, style: "solid" | "dashed" |
-             "dotted", label: str | None)
-    Arrow(base (3,), tip (3,), role, label)
+             "dotted", label: str | None, label_at: (3,) | None)
+    Arrow(base (3,), tip (3,), role, label, label_at: (3,) | None)
+        # label_at: where the word sits, set by spread_labels below;
+        #   the tip or the last point when None
     Glyph(center (3,), radius, role, label: str | None)
     Triad(origin (3,), axes (3, 3) as columns, role, labels (3 strings))
     Surface(points (n, 3), faces (m, 3 or 4), role, markings: list of
@@ -167,7 +169,16 @@ function describe_view(store, spec, state, rc, view) -> ViewScene:
               + arrows(...) + moving triad + readouts
               + [Text(legend lines, "bottom_right")] if state.legend
                 #   and this is the last view shown (the legend is
-                #   drawn once, on a translucent background)
+                #   drawn once, left-justified at a fixed offset on an
+                #   opaque background)
+        the dynamic list passes through spread_labels(dynamic, up,
+            extent) before the readouts are appended: every labeled
+            arrow gets label_at just past its tip (LABEL_BEYOND ×
+            extent along the arrow), every labeled path its last
+            point, and an anchor within LABEL_CLEARANCE × extent of an
+            earlier one is moved along the view's up by LABEL_STEP ×
+            extent until clear, so that at a landing, where the arrows
+            are short and share a base, the words do not pile up
     info.camera_target = R(t) r̃_P if (view == "inertial" and
                           state.camera_mode == "follow") else r̃_P at 0
                           (inertial) or r̃_P (rotating)

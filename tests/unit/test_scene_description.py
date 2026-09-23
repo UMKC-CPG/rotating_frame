@@ -160,6 +160,25 @@ def test_the_readouts_say_what_the_design_asks(runs):
     assert 'launch point' not in '\n'.join(plain_text.lines)
 
 
+def test_labels_are_spread_at_a_landing(runs):
+    spec, store = runs['earth_drop']
+    landing = store.stop_of(0).index
+    scene = describe_view(store, spec, state(k=landing), RC, 'rotating')
+    anchors = [d.label_at for d in scene.dynamic
+               if isinstance(d, (Arrow, Polyline)) and d.label]
+    assert len(anchors) >= 6
+    for i, first in enumerate(anchors):
+        assert first is not None
+        for second in anchors[i + 1:]:
+            assert np.linalg.norm(first - second) >= \
+                0.1 * scene.info.extent - 1e-12
+    # A long arrow keeps its label at its tip.
+    scene = describe_view(store, spec, state(k=0), RC, 'rotating')
+    true = [a for a in arrows_of(scene) if a.role == 'true'][0]
+    assert np.linalg.norm(true.label_at - true.tip) <= \
+        0.05 * scene.info.extent
+
+
 def test_extent_is_at_least_one(runs):
     spec, store = runs['turntable']
     assert extent(store, spec) >= 1.0
