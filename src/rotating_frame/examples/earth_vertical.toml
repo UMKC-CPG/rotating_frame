@@ -1,0 +1,20 @@
+# earth_vertical.toml -- a ball thrown straight up at 20 m/s at 39
+# degrees latitude. It lands a few millimetres west of its start, the
+# classic result that surprises.
+
+schema = 1
+
+[frame]
+preset = "earth"
+latitude = "39 deg"
+
+[[launch]]
+position = ["0 m", "0 m", "1 m"]
+speed = "20 m/s"
+elevation = "90 deg"
+label = "ball"
+
+[run]
+duration = "6 s"
+stop = "lands"
+samples = 1200

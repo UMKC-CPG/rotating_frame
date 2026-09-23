@@ -76,7 +76,7 @@ design section it implements, status.
    governs `run/schema.py`, `run/rc.py`, `run/run_spec.py`,
    `run/serialization.py`, `run/results_store.py`, `run/driver.py`,
    `tests/unit/test_architecture.py`, and the other tests it names;
-   replaces the placeholder `run/run_file.py`. Design 8. *reviewed*
+   replaces the placeholder `run/run_file.py`. Design 8. *implemented*
 9. [`pseudocode/09-scene-and-geometry.md`](
    pseudocode/09-scene-and-geometry.md) — governs `geometry/`,
    `render/scene_description.py`, `render/palettes.py`,

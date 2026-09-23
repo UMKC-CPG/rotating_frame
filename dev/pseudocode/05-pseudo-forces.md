@@ -90,9 +90,10 @@ and `velocity_rot`, and tolerance `1e-14`:
   `tests/integration/test_closure.py`:** for every packaged run, the
   centered difference of the store's rotating velocities,
   `(v_rot[k+1] − v_rot[k−1]) / (2 Δt̃)`, agrees with
-  `true_force[k] + total[k]` at interior samples to
-  `Δt̃² (rate (rate² |r̃| + 2 rate |ṽ| + |g̃|)) / 6` plus `1e-12`,
-  with the bound evaluated from the run's own maxima and written
+  `true_force[k] + total[k]` at interior samples to the bound of
+  Design 5.5, `Δt̃² (rate² v_max + 2 rate a_max) / 6 + ε (v_max + rate
+  r_max) / Δt̃` with `a_max = f_max + rate² r_max + 2 rate v_max` and
+  `ε = 2.2e-16`, evaluated from the run's own maxima and written
   into the assertion message; the same test with `velocity_in` fed
   to `terms` in place of `velocity_rot` fails, which is asserted, so
   that the test is known to catch the mistake it exists for.

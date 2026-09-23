@@ -136,11 +136,17 @@ because the check of Design 6 would agree with itself.
   differencing the store's transformed samples with a centered
   difference gives `ã_rot,k ≈ (ṽ_rot,k+1 − ṽ_rot,k−1) / (2 Δt̃)`, and
   `f̃_rot,k + f̃_cf,k + f̃_co,k + f̃_eu,k` agrees with it to the
-  differencing error, `Δt̃² |d³r̃/dt̃³| / 6`, which for the closed forms
-  is bounded by `Δt̃² Ω̃ (Ω̃² |r̃| + 2 Ω̃ |ṽ| + |g̃|) / 6` and is stated
-  in the test. This is the test that would catch a term evaluated
-  from the wrong velocity (`ṽ_in` in place of `ṽ_rot`), the commonest
-  mistake in this subject.
+  differencing error plus the rounding of the difference. The
+  differencing error is `Δt̃² |dã_rot/dt̃| / 6`, and differentiating
+  the rotating-frame equation for a force constant in rotating
+  components gives `|dã_rot/dt̃| ≤ Ω̃² |ṽ| + 2 Ω̃ |ã_rot|` with
+  `|ã_rot| ≤ |f̃| + Ω̃² |r̃| + 2 Ω̃ |ṽ|`. The rounding matters on the
+  Earth, where a sample step is `10⁻⁷` in natural time and the
+  rotating velocity is the small difference of two rim-sized numbers
+  (`R̃_E`): it is `ε (|ṽ| + Ω̃ |r̃|) / Δt̃` with `ε` the machine epsilon.
+  The test states both, from the run's own maxima. This is the test
+  that would catch a term evaluated from the wrong velocity (`ṽ_in`
+  in place of `ṽ_rot`), the commonest mistake in this subject.
 - Shape: (5.1) on arrays of shape `(N_p, N, 3)` returns three arrays
   of that shape equal, element by element, to the function called
   on each state alone.

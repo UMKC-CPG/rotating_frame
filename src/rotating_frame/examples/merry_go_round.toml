@@ -1,0 +1,22 @@
+# merry_go_round.toml -- a ball thrown across a playground roundabout,
+# from the rim, a metre above the platform, toward the far side.
+#
+# Space-fixed gravity: the room's, constant in the inertial frame. The
+# platform is flush with the floor, so "lands" is height zero anywhere.
+
+schema = 1
+
+[frame]
+preset = "merry_go_round"                 # 0.5 rad/s, radius 2.0 m
+
+[[launch]]
+position = ["1.8 m", "0 m", "1.0 m"]      # near the east rim, 1 m up
+speed = "3 m/s"
+azimuth = "270 deg"                       # toward the west: across
+elevation = "20 deg"
+label = "ball"
+
+[run]
+duration = "2 s"
+stop = "lands"
+samples = 400

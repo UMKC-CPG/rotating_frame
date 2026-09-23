@@ -34,7 +34,7 @@ from rotating_frame.cli.support import (copy_examples, copy_rc_file,
                                  record_command, self_check)
 from rotating_frame.core.motion import circular_motion_samples
 from rotating_frame.render.palettes import PALETTE_NAMES
-from rotating_frame.run import RunFileError, load_run_file
+from rotating_frame.run.run_file import RunFileError, load_run_file
 
 COMMAND_NAME = 'rfsim'
 RC_FILENAME = 'rfsimrc.py'

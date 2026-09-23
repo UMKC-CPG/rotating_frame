@@ -1,0 +1,22 @@
+# earth_drop.toml -- a stone dropped from rest at a hundred metres at
+# the group's latitude. It lands 1.7 cm east of the point below it.
+#
+# Frame-fixed gravity by the uniform approximation (design 3.4): the
+# central field replaced by its value at the launch point, magnitude
+# the bare attraction 9.820 m/s^2, so that the centrifugal term the
+# tool draws is not counted twice.
+
+schema = 1
+
+[frame]
+preset = "earth"
+latitude = "39 deg"
+
+[[launch]]
+position = ["0 m", "0 m", "100 m"]        # a hundred metres up
+label = "stone"
+
+[run]
+duration = "10 s"
+stop = "lands"
+samples = 1000

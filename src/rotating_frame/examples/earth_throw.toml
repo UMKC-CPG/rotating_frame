@@ -1,0 +1,21 @@
+# earth_throw.toml -- a projectile launched east at 45 degrees from the
+# ground at 39 degrees latitude, deflected to the right and lifted by
+# the Coriolis term.
+
+schema = 1
+
+[frame]
+preset = "earth"
+latitude = "39 deg"
+
+[[launch]]
+position = ["0 m", "0 m", "1 m"]          # from shoulder height
+speed = "30 m/s"
+azimuth = "90 deg"                        # east
+elevation = "45 deg"
+label = "shot"
+
+[run]
+duration = "10 s"
+stop = "lands"
+samples = 1000

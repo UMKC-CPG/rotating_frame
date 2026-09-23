@@ -38,9 +38,11 @@ frozen record Key:
 
 SCHEMA = [  # every key of Design 8.1, one Key each; the tables:
   frame:  preset (choice: turntable | merry_go_round | earth, REQUIRED),
-          rate (quantity rate, PRESET, bare), latitude (quantity angle,
-          OPTIONAL, bare), length_scale (quantity length, PRESET, bare),
-          exaggeration (number, 1.0)
+          rate (quantity rate, PRESET, not bare), latitude (quantity
+          angle, OPTIONAL, bare), length_scale (quantity length, PRESET,
+          not bare), exaggeration (number, 1.0)
+          # rate and length_scale define the natural units, so a bare
+          #   number for either would be circular; they take strings
   force:  kind (choice none | uniform, PRESET), fixed_in (choice
           space | frame, PRESET), magnitude (quantity acceleration,
           PRESET, bare)
@@ -212,7 +214,7 @@ function write_resolved(spec, path, view = None) -> None:
 ## 8.5 `run/results_store.py`
 
 ```
-BYTES_PER_SAMPLE = 40 * 8                      # Design 8.5
+BYTES_PER_SAMPLE = 36 * 8      # Design 8.5: at most 36 numbers a sample
 
 function estimate_bytes(n_particles, samples) -> int:
     return n_particles * samples * BYTES_PER_SAMPLE
@@ -250,6 +252,9 @@ class ResultsStore:
     method terms_at(i, k) -> (terms[i,k], true_force[i,k])
     method error_at(i, k) -> (comparison[i].delta[k], .eta[k]) or None
     method conserved_at(i, k) -> the drifts at k and the notes
+    # Both return None for a sample past the particle's stop (the
+    #   mask is false there): the per-particle records run only to
+    #   the event sample.
     method stop_of(i) -> StopRecord or None
     method size_bytes() -> sum of nbytes
 ```

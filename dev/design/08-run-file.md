@@ -93,7 +93,7 @@ write-back says so. A preset's own values are always in SI.
 **Two shipped examples**, both complete after the preset fills
 in: `turntable.toml`, a puck pushed from the rim toward the center
 with a twelve-member inward ring; and `earth_drop.toml`, the stone
-above, at `39°` (the group's latitude), which lands `1.5 cm` east.
+above, at `39°` (the group's latitude), which lands `1.7 cm` east.
 The others of G4 (`merry_go_round.toml`, `earth_throw.toml`,
 `earth_vertical.toml`) follow the same shape.
 
