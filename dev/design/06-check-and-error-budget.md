@@ -65,14 +65,25 @@ the effect:
   η_k   = δ̃_k / max(|Δ̃_k|, δ̃_floor)   error as a fraction of the effect
 ```
 
-where the **ghost path** `ρ̃_ghost` is what the rotating observer
-would predict with no pseudo-forces at all: the motion under `f̃_rot`
-alone, from the same rotating-frame launch. For the first version's
-fields `f̃_rot` is constant in rotating components (Design 3.3, 3.4),
-so the ghost is a line or a parabola in the rotating frame, a closed
-form; for a future field it is integrated like the check. `δ̃_floor`
-is a small number, `10⁻⁹`, that keeps the ratio finite at `t̃ = 0`,
-where the effect is zero.
+where the **ghost path** `ρ̃_ghost` is the inertial expectation: the
+motion under `f̃_rot` alone, from the same rotating-frame launch, with
+nothing of the non-inertial frame in it, not even the centrifugal
+term the rider on the Earth has absorbed into the gravity they
+measure. For the first version's fields `f̃_rot` is constant in
+rotating components (Design 3.3, 3.4), so the ghost is a line or a
+parabola in the rotating frame, a closed form; for a future field it
+is integrated like the check. `δ̃_floor` is a small number, `10⁻⁹`,
+that keeps the ratio finite at `t̃ = 0`, where the effect is zero.
+
+On the Earth this choice has a consequence worth teaching: the ghost
+falls along the bare attraction, radially, while the true path falls
+along the plumb line, so over a hundred-metre drop the effect is a
+displacement of order a tenth of a metre that is almost entirely
+centrifugal, with the 1.5 cm Coriolis deflection inside it. That is
+the honest picture: the frame's largest effect is the one the rider
+never notices because it is already in their `g`. The first-order
+formula of 6.5 therefore carries the centrifugal part as well as the
+Coriolis part, and the readouts show the two separately.
 
 The ghost path is also drawn, dashed, in the rotating view (Design
 9), because it is the picture of the mistake: "where I would have
@@ -154,24 +165,33 @@ integration", so the change of meaning is visible.
 
 ## 6.5 The first-order deflections
 
-`analysis/closed_form_deflections.py` holds the textbook results,
-for two uses: an overlay in the rotating view (the first-order
-prediction drawn against the exact path, Design 9), and the oracles
-of the tests. To first order in `Ω`, a particle launched with
-rotating-frame velocity `ṽ₀` in uniform gravity `g̃` (either kind;
-constant in rotating components) is displaced from its ghost path by
+`analysis/closed_form_deflections.py` holds two formulas, for two
+uses: an overlay in the rotating view (the first-order prediction
+drawn against the exact path, Design 9), and the oracles of the
+tests. Both are relative to the ghost of 6.2, the inertial
+expectation. Write `C(u) = −Ω̃ × (Ω̃ × u)` for the centrifugal
+operator, which is linear in its argument. Integrating (6.1) twice
+with every pseudo-force evaluated along the ghost, whose position is
+`r̃_P + ṽ₀ t̃ + f̃ t̃²/2` and whose velocity is `ṽ₀ + f̃ t̃`, a particle
+launched with rotating-frame velocity `ṽ₀` under the true force `f̃`
+(constant in rotating components) is displaced from its ghost by
 
 ```
-  Δ̃(t̃) = − Ω̃ × ( ṽ₀ t̃² + g̃ t̃³ / 3 ),                               (6.4)
+  Δ̃(t̃) = C(r̃_P) t̃²/2 + C(ṽ₀) t̃³/6 + C(f̃) t̃⁴/24
+          − Ω̃ × ( ṽ₀ t̃² + f̃ t̃³ / 3 ).                                (6.4)
 ```
 
-obtained by integrating (6.1) with the Coriolis term evaluated on
-the ghost velocity `ṽ₀ + g̃ t̃` and the centrifugal term's variation
-neglected. Its special cases are the classroom formulas:
+The first line is the centrifugal part, exact along the ghost; the
+second is the **Coriolis part**, the textbook deflection, which the
+module offers on its own as well, because its special cases are the
+classroom formulas and because the readouts show the two parts of
+the effect separately (6.2):
 
-- **The drop** (`ṽ₀ = 0`): `Δ̃ = −(t̃³/3) Ω̃ × g̃`; on the Earth, with
-  `g̃` along `−ê_U` and `Ω̃ = Ω̃ (sin λ ê_U + cos λ ê_N)`, this is
-  `(1/3) g̃ Ω̃ t̃³ cos λ ê_E`, east, as in Design 1.8 and the spike.
+- **The drop** (`ṽ₀ = 0`): the Coriolis part is `−(t̃³/3) Ω̃ × g̃`; on
+  the Earth, with `g̃` along `−ê_U` and `Ω̃ = Ω̃ (sin λ ê_U + cos λ
+  ê_N)`, this is `(1/3) g̃ Ω̃ t̃³ cos λ ê_E`, east, as in Design 1.8
+  and the spike. The centrifugal part is what the ghost's radial fall
+  lacks against the true fall along the plumb line.
 - **A vertical launch upward** at `ṽ₀ = ṽ₀ ê_U`: the `ṽ₀ t̃²` term is
   west and the `g̃ t̃³/3` term east; a ball thrown straight up lands
   west of its launch point, by `(4/3) ṽ₀³ Ω̃ cos λ / g̃²` at the return
@@ -181,15 +201,18 @@ neglected. Its special cases are the classroom formulas:
   the right of the motion, and the vertical part is the Eötvös
   term, `Ω̃ ṽ₀ t̃² cos λ sin ψ` upward for an eastward launch.
 
-**Their accuracy, for the tests.** (6.4) omits terms of relative
-order `Ω̃ t̃` (the Coriolis term acting on the Coriolis velocity, and
-the centrifugal term's change along the path) and, on the Earth,
-the effective-gravity and plumb-line corrections of order
-`Ω² R_E / g₀ = 3.45 × 10⁻³` (Design 4.6, where for the drop they
-combine into exactly `1 − Ω² R_E / g₀`). A test compares the tool's
-exact deflection with (6.4) at a relative tolerance of
-`2 (Ω² R_E / g₀) + (Ω̃ t̃)²`, stated in the test with this derivation,
-and the drop test uses the sharper factor of Design 4.6. On the
+**Their accuracy, for the tests.** (6.4) omits the Coriolis term
+acting on the velocities the pseudo-forces themselves produce, and
+the centrifugal term acting on the displacements they produce. The
+largest omission on the Earth is the Coriolis term acting on the
+centrifugal velocity `C(r̃_P) t̃`, whose displacement is
+`Ω̃³ R̃_E t̃³/3`, of relative size `(2/3) Ω̃ t̃` against the centrifugal
+part and `Ω² R_E / g₀ = 3.45 × 10⁻³` against the Coriolis part of a
+drop. A test compares the tool's exact effect with (6.4) at a
+relative tolerance of `Ω̃ t̃ + 2 (Ω² R_E / g₀) + (Ω̃ t̃)²`, stated in
+the test with this derivation; and the eastward component of a drop's
+effect, which is pure Coriolis, against the Coriolis part alone
+within the sharper factor `1 − Ω² R_E / g₀` of Design 4.6. On the
 turntable, where `Ω̃ t̃` is of order one, (6.4) is not an oracle and
 is not overlaid: the overlay is offered only where `Ω̃ t̃_end < 0.1`,
 and the screen says so.

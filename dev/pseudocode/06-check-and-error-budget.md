@@ -176,26 +176,42 @@ OVERLAY_LIMIT = 0.1                    # rate × duration below which the
 function overlay_applies(frame, duration) -> bool:
     return |frame.rate| * duration < OVERLAY_LIMIT
 
-function first_order_deflection(frame, velocity_rot0, gravity_rot, times)
-        -> (N, 3):                                                # (6.4)
-    # Displacement from the ghost path, rotating components, to first
-    #   order in the rate. gravity_rot is the rotating-component
-    #   force per unit mass (zero for NoForce).
+function centrifugal_operator(frame, vectors) -> (…, 3):
+    # C(u) = −Ω × (Ω × u), linear in u; broadcasts over leading axes.
+    omega = frame.angular_velocity(0.0)
+    return -cross(omega, cross(omega, vectors))
+
+function coriolis_deflection(frame, velocity_rot0, force_rot, times)
+        -> (N, 3):                             # the Coriolis part of (6.4)
+    # The textbook deflection: the Coriolis term integrated twice along
+    #   the ghost's velocity v0 + f t. force_rot is the true force per
+    #   unit mass in rotating components (zero for NoForce).
     omega = frame.angular_velocity(0.0)
     return -cross(omega, outer(times², velocity_rot0)
-                         + outer(times³ / 3, gravity_rot))
+                         + outer(times³ / 3, force_rot))
+
+function first_order_deflection(frame, launch_point_rot, velocity_rot0,
+                                force_rot, times) -> (N, 3):      # (6.4)
+    # Displacement from the ghost of 6.2: the centrifugal part along
+    #   the ghost plus the Coriolis part.
+    return (outer(times² / 2,  centrifugal_operator(frame, launch_point_rot))
+            + outer(times³ / 6,  centrifugal_operator(frame, velocity_rot0))
+            + outer(times⁴ / 24, centrifugal_operator(frame, force_rot))
+            + coriolis_deflection(frame, velocity_rot0, force_rot, times))
 
 function first_order_tolerance(frame, duration, earth_ratio) -> float:
     # The relative tolerance a test uses against (6.4), Design 6.5:
-    #   2 (Ω² R_E / g₀) + (Ω t)². `earth_ratio` is Ω² R_E / g₀ for the
-    #   Earth preset and 0 on a platform.
-    return 2 * earth_ratio + (frame.rate * duration) ** 2
+    #   Ω t + 2 (Ω² R_E / g₀) + (Ω t)². `earth_ratio` is Ω² R_E / g₀ for
+    #   the Earth preset and 0 on a platform.
+    turned = |frame.rate| * duration
+    return turned + 2 * earth_ratio + turned ** 2
 ```
 
 The classroom cases (the drop, the vertical launch, the horizontal
-launch) are tests of this function, not functions of their own; the
-overlay in the scene is `first_order_deflection` added to the ghost
-path (Pseudocode 9).
+launch) are tests of `coriolis_deflection`, not functions of their
+own; the overlay in the scene is `first_order_deflection` added to
+the ghost path (Pseudocode 9), and the readouts show the centrifugal
+and Coriolis parts of the effect separately (Design 6.2).
 
 ## 6.5 `analysis/error_budget.py`: three columns
 
@@ -268,9 +284,10 @@ AST test adapted.
 
 - `overlay_applies` is true for a five-second Earth drop and false
   for a turntable run of one turn.
-- The drop: `first_order_deflection` with `velocity_rot0 = 0` and the
+- The drop: `coriolis_deflection` with `velocity_rot0 = 0` and the
   Earth's `gravity_rot` at `λ` gives `(1/3) g̃ Ω̃ t̃³ cos λ ê_E`, east,
-  to `1e-14`, at three latitudes.
+  to `1e-14`, at three latitudes; the vertical and horizontal cases
+  below likewise use `coriolis_deflection`.
 - The vertical launch: a `20 m/s` throw at `45°` returns west by
   `(4/3) v₀³ Ω cos λ / g²` at `t = 2 v₀/g`, `5.70 mm`, to `1e-12`
   (checked while Design 6 was written).
@@ -278,9 +295,11 @@ AST test adapted.
   deflection is to the right (south) with magnitude `Ω v₀ t² sin λ`
   and the vertical part is upward with magnitude `Ω v₀ t² cos λ`.
 - Against the exact trajectories of Pseudocode 4 through the
-  transform, the same three cases agree with `first_order_deflection`
-  within `first_order_tolerance`, and the drop within the sharper
-  factor of Pseudocode 4.6.
+  transform, less the ghost of 6.2, the same three cases agree with
+  `first_order_deflection` within `first_order_tolerance`; and the
+  eastward component of the drop's effect, which is pure Coriolis,
+  agrees with `coriolis_deflection`'s within the sharper factor
+  `1 − Ω² R_E / g₀` of Pseudocode 4.6 to `1e-5`.
 
 `test_error_budget.py`:
 

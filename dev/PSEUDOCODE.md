@@ -66,7 +66,7 @@ design section it implements, status.
    `analysis/comparison.py`, `analysis/ghost_path.py`,
    `analysis/conservation_monitor.py`,
    `analysis/closed_form_deflections.py`, `analysis/error_budget.py`,
-   and their tests. Design 6. *reviewed*
+   and their tests. Design 6. *implemented*
 7. [`pseudocode/07-launches-and-the-ring.md`](
    pseudocode/07-launches-and-the-ring.md) — governs
    `launch/launch_spec.py`, `launch/ring.py`, and

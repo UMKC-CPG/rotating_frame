@@ -292,7 +292,8 @@ function build_store(spec, rc, progress = None) -> ResultsStore:  # (8.6)
         if overlay applies (view.overlay != "off" and
                 overlay_applies(spec.frame, spec.duration)):
             overlay[i, :M] = first_order_deflection(spec.frame,
-                launch.velocity_rot, f̃_rot at launch, trajectory.times) # 6.4
+                spec.axes.launch_point, launch.velocity_rot,
+                f̃_rot at launch, trajectory.times)                  # 6.4
         stops[i] = StopRecord(...) from trajectory.stop, or None
         if progress: progress(i, n_p)
     flag every array read-only
