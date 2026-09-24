@@ -12,6 +12,9 @@ from rotating_frame.render.scene_description import (ARROW_FRACTION,
                                                      Arrow, Polyline, Text,
                                                      Triad, describe,
                                                      describe_view, extent)
+from rotating_frame.core.natural_units import to_real
+from rotating_frame.core.units import format_real
+from rotating_frame.geometry import ghost_now
 from rotating_frame.run import build_store, load_rc, load_run_file
 
 EXAMPLES = Path(__file__).resolve().parents[2] / 'src' / 'rotating_frame' \
@@ -181,6 +184,33 @@ def test_the_readouts_say_what_the_design_asks(runs):
     plain = describe_view(store_t, turntable, state(), RC, 'rotating')
     plain_text = [d for d in plain.dynamic if isinstance(d, Text)][0]
     assert 'launch point' not in '\n'.join(plain_text.lines)
+
+
+def test_the_readouts_state_the_gap_to_the_ghost(runs):
+    # Design 6.2's |Δ̃_k|, the distance from where a purely inertial
+    # motion would have put the ball: zero at the launch, and after it
+    # the norm of the position minus the ghost, formatted as a length.
+    spec, store = runs['earth_drop']
+    for k in (0, 40):
+        scene = describe_view(store, spec, state(k=k), RC, 'rotating')
+        text = [d for d in scene.dynamic if isinstance(d, Text)
+                and d.corner == 'top_left'][0]
+        line = [line for line in text.lines if 'ghost' in line][0]
+        # Past the landing the readout holds the stop, as the scene does.
+        sample = min(k, store.valid_samples(0) - 1)
+        gap = np.linalg.norm(store.positions_rot[0, sample]
+                             - ghost_now(store, spec, 0, sample))
+        expected = format_real(to_real(spec.scales, gap, 'length'),
+                               'length', 'cm')
+        assert line.endswith(expected)
+        if k == 0:
+            assert gap == 0.0
+        else:
+            assert gap > 0.0
+    inertial = describe_view(store, spec, state(k=40), RC, 'inertial')
+    inertial_text = [d for d in inertial.dynamic if isinstance(d, Text)
+                     and d.corner == 'top_left'][0]
+    assert not any('ghost' in line for line in inertial_text.lines)
 
 
 def test_labels_are_spread_at_a_landing(runs):

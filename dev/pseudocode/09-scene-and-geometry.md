@@ -166,7 +166,13 @@ function readouts(store, spec, state, info, view, frame_note = None)
     lines: time (t̃_k, format_real(t_k, "time"), θ_k in degrees);
            for the tracked particle in the rotating view: the launch as
            given (Pseudocode 7.1 spec), position (E, N, U) and speed in
-           real units, each drawn arrow's magnitude in m/s² (and N with
+           real units; the gap to the ghost,
+             |p_rot − ghost_now(store, spec, tracked, k)|,
+           Design 6.2's |Δ̃_k|, in real units (cm on the Earth as the
+           deflections are), from the store's ghost array that the
+           driver always fills (Pseudocode 8.5) and that ghost_now holds
+           at the stop as the position is held; each drawn arrow's
+           magnitude in m/s² (and N with
            a mass); the scale note (L, T, "Ω exaggerated × α" if α ≠ 1,
            "pseudo-force arrows × ratio" if ratio, "camera follows P"
            if it does); the approximation note with its estimate on the
@@ -407,7 +413,10 @@ run at `k ∈ {0, N/2, last}`:
   view and two for `both`;
 - the readouts contain the scale note, the exaggeration line when
   `α ≠ 1`, the approximation note on the Earth and not on the
-  turntable, and the tracked launch's speed as given.
+  turntable, the tracked launch's speed as given, and in the
+  rotating view the gap to the ghost, zero at `k = 0` and equal to
+  `|p_rot − ghost_now|` formatted as a length after; the inertial
+  view has no such line.
 
 `test_palettes.py`: every palette has every role; the colorblind
 palette's six arrow colors are pairwise distinguishable under the

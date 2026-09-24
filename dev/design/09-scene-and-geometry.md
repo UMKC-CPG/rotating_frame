@@ -254,6 +254,13 @@ A text block in each view's corner, updated per sample:
   which the run controls of Design 10 change; its position as
   `(E, N, U)` from `P` and speed, in real units; the magnitude of
   each drawn arrow in `m/s²` (and in newtons when a mass is given);
+- for the tracked particle, in the rotating view: the distance from
+  the ghost, `|Δ̃_k|` of Design 6.2, which is the whole displacement
+  the pseudo-forces have produced from where a purely inertial motion
+  would have put the ball, in real units (centimetres on the Earth
+  when small, as the deflections are). It is stated whether or not
+  the ghost path is drawn, so that the number is there when the
+  dashed line is switched off, and it reads zero at the launch;
 - the scale note: `1 unit = L`, `1 time unit = T`, the exaggeration
   `× α` when not one, the arrow-scale ratio when not one, and
   `camera follows P` when it does;

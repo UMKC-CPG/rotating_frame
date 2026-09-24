@@ -244,6 +244,15 @@ def _format(spec, value_natural, kind, unit=None):
                              unit or display[kind])
 
 
+def _length_text(spec, value_natural):
+    """A length for the readouts: on the Earth a small one is given
+    in centimetres, since the deflections are centimetres and a
+    reader should not count decimals of a metre."""
+    if spec.preset.name == 'earth' and abs(value_natural) < 1.0:
+        return _format(spec, value_natural, 'length', 'cm')
+    return _format(spec, value_natural, 'length')
+
+
 def readouts(store, spec, state, info, view, frame_note=None):
     """The text block of design 9.7 for this view; `frame_note` is
     the session's drawing-rate line, appended last when given."""
@@ -269,13 +278,18 @@ def readouts(store, spec, state, info, view, frame_note=None):
         _, _, position_rot, velocity_rot = store.state_at(tracked, sample)
         local = spec.axes.basis().T @ (position_rot - spec.axes.launch_point)
         east, north, up = local
-        if spec.preset.name == 'earth' and abs(east) < 1.0:
-            east_text = _format(spec, east, 'length', 'cm')
-        else:
-            east_text = _format(spec, east, 'length')
         speed_text = _format(spec, np.linalg.norm(velocity_rot), 'speed')
-        lines.append(f'E {east_text}, N {_format(spec, north, "length")}, '
+        lines.append(f'E {_length_text(spec, east)}, '
+                     f'N {_format(spec, north, "length")}, '
                      f'U {_format(spec, up, "length")}; speed {speed_text}')
+        # The gap to the ghost, design 6.2's |Δ̃_k|: the whole
+        #   displacement the pseudo-forces have produced from where a
+        #   purely inertial motion would have put the ball. Past the
+        #   stop the ghost is held at the stop, as the position is.
+        gap = np.linalg.norm(position_rot
+                             - ghost_now(store, spec, tracked, sample))
+        lines.append('from the inertial expectation (ghost): '
+                     f'{_length_text(spec, gap)}')
         terms, force_rot = store.terms_at(tracked, sample)
         mass = launch.mass
         for name, vector in (('true force', force_rot),
