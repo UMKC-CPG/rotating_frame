@@ -95,6 +95,29 @@ def test_arrow_lengths_and_the_stated_ratio(runs):
     assert plain.info.arrow_ratio is None
 
 
+@pytest.mark.parametrize('name', ['turntable', 'merry_go_round',
+                                  'earth_drop', 'earth_throw',
+                                  'earth_vertical'])
+@pytest.mark.parametrize('view', ['inertial', 'rotating'])
+def test_the_velocity_arrow_never_exceeds_its_quarter(runs, name, view):
+    # The scale is set by the largest speed over the run, so no sample's
+    # velocity arrow is longer than a quarter of the extent and the longest is
+    # exactly that. The drop is the case that matters: launched at rest, its
+    # rotating-frame speed at k = 0 is zero, and a scale set from that speed
+    # drew every later arrow astronomically long (design 9.4).
+    spec, store = runs[name]
+    lengths = []
+    for k in range(store.n_samples):
+        scene = describe_view(store, spec, state(k=k), RC, view)
+        velocity = [a for a in arrows_of(scene) if a.role == 'velocity'][0]
+        lengths.append(np.linalg.norm(velocity.tip - velocity.base))
+        quarter = ARROW_FRACTION * scene.info.extent
+        assert lengths[-1] <= quarter * (1.0 + 1e-9)
+    assert max(lengths) == pytest.approx(quarter)
+    if name == 'earth_drop' and view == 'rotating':
+        assert lengths[0] == 0.0
+
+
 def test_the_camera_target_follows_or_stays(runs):
     spec, store = runs['earth_drop']
     k = 40
@@ -108,8 +131,8 @@ def test_the_camera_target_follows_or_stays(runs):
     assert following.info.camera_follows and not fixed.info.camera_follows
     rotating = describe_view(store, spec, state(k=k), RC, 'rotating')
     assert np.allclose(rotating.info.camera_target, spec.axes.launch_point)
-    # Every dynamic point is relative to the target: the tracked
-    # glyph sits near the origin of the scene.
+    # Every dynamic point is relative to the target: the tracked glyph sits near
+    # the origin of the scene.
     glyph_centers = [d.center for d in rotating.dynamic
                      if type(d).__name__ == 'Glyph']
     assert np.linalg.norm(glyph_centers[0]) < 2.0 * rotating.info.extent

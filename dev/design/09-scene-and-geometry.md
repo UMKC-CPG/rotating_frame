@@ -149,9 +149,8 @@ particle: the true force `f̃_in` and the velocity `ṽ_in`. In the
 rotating view: the true force `f̃_rot`, the three terms, their sum,
 and `ṽ_rot`. Each arrow's base is the glyph and its tip is the base
 plus the vector times a scale (9.4); each carries its word at the
-tip. The velocity arrow has its own scale, `1 unit of ṽ` to a
-quarter of the scene, since velocity and acceleration are not
-commensurable.
+tip. The velocity arrow has a scale of its own (9.4), since velocity
+and acceleration are not commensurable.
 
 ## 9.4 Two arrow scales, both stated
 
@@ -175,7 +174,21 @@ On the turntable all three are of order one. So:
   makes the pseudo-force arrows invisible; it is offered because
   seeing them vanish is the honest picture of their size, and the
   screen then says which arrows are below a pixel.
-- The rc file's `arrow_scale` multiplies both.
+- The **velocity arrow** has a third scale, `s_velocity`, its own in
+  each view: the tracked particle's *largest speed over the run*, in
+  that view's description, is a quarter of the extent. It is the
+  largest over the run and not the speed at launch because a dropped
+  ball is launched at rest in the rotating frame, and a scale made
+  from a zero speed drew every later arrow astronomically long: an
+  actor of `10³⁰` units that on a real GPU swallowed the camera and
+  blacked out the rotating view (found 2026-09-24). Under the largest
+  speed the arrow of a drop grows from nothing to a quarter of the
+  scene at its fastest and can never exceed it. The two views' speeds
+  differ, on the Earth by the ground's hundreds of metres a second,
+  and nothing is compared across the views by the velocity arrow, so
+  no ratio is stated for it. A particle that never moves draws no
+  velocity arrow at any sample, and its scale is then arbitrary.
+- The rc file's `arrow_scale` multiplies all three.
 
 The scales are part of the distortion column of the error panel
 (Design 6.4). **Rejected: a logarithmic arrow length.** It would make
@@ -268,7 +281,9 @@ so the screen never shows a natural-unit value without saying so.
   scales; in `auto` mode the largest of each group at `k = 0` is a
   quarter of the extent; on the turntable the two scales are equal
   and no ratio is reported; on the Earth the ratio is reported and
-  is what the store implies.
+  is what the store implies; in each view the velocity arrow's
+  longest over the run is a quarter of the extent and no sample's is
+  longer, the drop included.
 - Every palette has every role; the `colorblind` palette's arrow
   colors are pairwise distinguishable under the two common
   deficiencies (a table of simulated colors, checked once, as the

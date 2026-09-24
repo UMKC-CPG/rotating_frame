@@ -78,6 +78,13 @@ numbering so older cross-references still resolve.
       (P8, P9, P10 with the turntable and merry-go-round runs),
       `v0.7-earth` (the Earth presets, the drop, the projectile, the
       ring). (Tagged 2026-09-23.)
+- [ ] (P9.5, render/vedo_renderer.py) `rotation_to` (Rodrigues)
+      divides by `1 + cos` and so is wrong for a direction within
+      about `1e-7` rad of `−x̂` and infinite within `1e-8`; no packaged
+      run reaches it, but at the equator the first sample after a
+      launch sits `7e-7` away. P9.5 does not yet state how an arrow is
+      oriented; write that (a wider half-turn gate, or a quaternion)
+      before the code changes.
 - [ ] (A10) `v1.0-classroom`: usable in a graduate mechanics course.
       Needs a session in a real window on Hellbender and on a laptop
       (the keys, the slider, the timer), the Earth runs judged by the

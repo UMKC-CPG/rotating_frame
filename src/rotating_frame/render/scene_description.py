@@ -152,7 +152,11 @@ def arrow_scales(store, spec, tracked, mode, rc, scene_extent,
     velocity scale is the view's own: on the Earth the inertial
     velocity is the ground's hundreds of metres a second plus the
     throw, and one scale for both views would make one of the two
-    arrows invisible or enormous."""
+    arrows invisible or enormous. It is set by the tracked particle's
+    largest speed over the run, never by its launch speed: a dropped
+    ball is launched at rest in the rotating frame, and a scale made
+    from a zero speed drew every later arrow astronomically long, an
+    actor that swallowed the camera and blacked out the view."""
     terms, true_force = store.terms_at(tracked, 0)
     true0 = float(np.linalg.norm(true_force))
     pseudo0 = float(np.max(np.linalg.norm(terms, axis=-1)))
@@ -167,10 +171,15 @@ def arrow_scales(store, spec, tracked, mode, rc, scene_extent,
         if (mode == 'same'
                 or 1.0 / SAME_SCALE_WITHIN <= ratio <= SAME_SCALE_WITHIN):
             scale_pseudo, ratio = scale_true, None
-    _, velocity_in, _, velocity_rot = store.state_at(tracked, 0)
-    velocity0 = velocity_in if view == 'inertial' else velocity_rot
-    speed0 = max(float(np.linalg.norm(velocity0)), TINY)
-    scale_velocity = quarter / speed0
+    # Past a particle's stop the store holds NaN under a false mask,
+    #   so the largest speed is taken over the valid samples only. The
+    #   floor is reached only by a particle that never moves, which
+    #   draws no velocity arrow at any sample.
+    velocities = (store.velocities_in if view == 'inertial'
+                  else store.velocities_rot)
+    speeds = np.linalg.norm(velocities[tracked], axis=-1)
+    speed_max = float(np.max(speeds[store.mask[tracked]]))
+    scale_velocity = quarter / max(speed_max, TINY)
     factor = rc.arrow_scale
     return (scale_true * factor, scale_pseudo * factor, ratio,
             scale_velocity * factor)

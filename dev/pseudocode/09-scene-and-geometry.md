@@ -115,7 +115,8 @@ function ghost_now(store, spec, i, k) -> (3,):   # the ghost's own point
 function extent(store) -> float:
     return max(1.0, max over valid samples of |positions_rot − r̃_P|)
 
-function arrow_scales(store, tracked, mode, rc, E) -> SceneInfo fields:
+function arrow_scales(store, tracked, mode, rc, E, view)
+        -> SceneInfo fields:
     true0   = |true_force[tracked, 0]|  (or 1e-30)
     pseudo0 = max over terms of |terms[tracked, 0]|  (or 1e-30)
     s_true   = (E / 4) / true0
@@ -123,9 +124,21 @@ function arrow_scales(store, tracked, mode, rc, E) -> SceneInfo fields:
     if mode == "same" or 1/3 <= s_pseudo / s_true <= 3:
         s_pseudo = s_true; ratio = None
     else: ratio = s_pseudo / s_true
-    s_velocity = (E / 4) / max(|velocities_rot[tracked, 0]|, 1e-30)
+    # The velocity scale is the view's own and is set by the LARGEST
+    #   speed over the run, never the launch speed: a drop is launched
+    #   at rest in the rotating frame, and (E / 4) / 1e-30 drew every
+    #   later arrow astronomically long (Design 9.4). The arrays are
+    #   the store's velocities_in and velocities_rot (Pseudocode 8.5),
+    #   filled by the driver and NaN past a particle's stop under a
+    #   false mask, so the maximum runs over mask[tracked] only.
+    velocities = velocities_in if view == "inertial" else velocities_rot
+    speed_max  = max over k with mask[tracked, k] of
+                 |velocities[tracked, k]|
+    s_velocity = (E / 4) / max(speed_max, 1e-30)
+        # the floor is reached only by a particle that never moves,
+        #   which draws no velocity arrow at any sample
     return s_true * rc.arrow_scale, s_pseudo * rc.arrow_scale, ratio,
-           s_velocity
+           s_velocity * rc.arrow_scale
 
 function arrows(store, spec, i, k, view, info, shown) -> list of Arrow:
     p_in, v_in, p_rot, v_rot = store.state_at(i, k)
@@ -166,10 +179,11 @@ function describe_view(store, spec, state, rc, view) -> ViewScene:
     #   paths, scenery, camera_mode, arrow_mode, legend).
     E    = extent(store); info = arrow_scales(...)
     # arrow_scales takes the view too: the velocity scale is the
-    #   view's own launch speed (on the Earth the inertial velocity is
-    #   the ground's plus the throw; one scale would make one of the
-    #   two arrows invisible or enormous). Nothing is compared across
-    #   the views by the velocity arrow, so nothing is stated.
+    #   view's own largest speed over the run (on the Earth the
+    #   inertial velocity is the ground's plus the throw; one scale
+    #   would make one of the two arrows invisible or enormous).
+    #   Nothing is compared across the views by the velocity arrow,
+    #   so nothing is stated.
     time = store.time_at(state.tracked, state.k)   # the grid's clock:
         # a stopped particle sits at its stop while the stage and the
         #   other particles go on; only the particle's own state is
@@ -385,7 +399,9 @@ run at `k ∈ {0, N/2, last}`:
   `auto` mode the largest of each group at `k = 0` is `E/4`; the
   turntable example reports `arrow_ratio None`, the Earth example a
   ratio equal to what the store implies; `same` mode gives `None`
-  everywhere;
+  everywhere; in each view, over every sample of every packaged run,
+  no velocity arrow is longer than `E/4` and the longest is `E/4`
+  (the drop's rotating arrow starts at nothing);
 - `camera_target` is `R(t_k) r̃_P` with `follow` and the initial
   point with `fixed`; `describe` returns one `ViewScene` for a single
   view and two for `both`;
